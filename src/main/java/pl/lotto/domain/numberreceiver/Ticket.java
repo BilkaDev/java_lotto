@@ -8,7 +8,8 @@ import java.util.Set;
 
 @Builder
 @Getter
-public class Ticket extends TicketBaseEntity {
+public class Ticket {
+    private String hash;
     private LocalDateTime drawDate;
     private Set<Integer> numbersFromUsers;
 }

@@ -2,10 +2,10 @@ package pl.lotto.domain.numberreceiver;
 
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 
-public class TicketMapper {
+class TicketMapper {
     public static TicketDto mapFromTicket(Ticket ticket) {
         return TicketDto.builder()
-                .ticketId(ticket.getUuid())
+                .hash(ticket.getHash())
                 .drawDate(ticket.getDrawDate())
                 .numbersFromUsers(ticket.getNumbersFromUsers())
                 .build();

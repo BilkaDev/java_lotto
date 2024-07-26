@@ -3,6 +3,7 @@ package pl.lotto.domain.numberreceiver;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryNumberReceiverRepositoryTestImpl implements INumberReceiverRepository {
@@ -10,7 +11,7 @@ public class InMemoryNumberReceiverRepositoryTestImpl implements INumberReceiver
 
     @Override
     public Ticket save(Ticket ticket) {
-        inMemoryDataBase.put(ticket.getUuid(), ticket);
+        inMemoryDataBase.put(ticket.getHash(), ticket);
         return ticket;
     }
 
@@ -22,5 +23,10 @@ public class InMemoryNumberReceiverRepositoryTestImpl implements INumberReceiver
                         ticket -> ticket.getDrawDate().isEqual(drawDate)
                 )
                 .toList();
+    }
+
+    @Override
+    public Optional<Ticket> findByHash(String hash) {
+        return inMemoryDataBase.get(hash) == null ? Optional.empty() : Optional.of(inMemoryDataBase.get(hash));
     }
 }
