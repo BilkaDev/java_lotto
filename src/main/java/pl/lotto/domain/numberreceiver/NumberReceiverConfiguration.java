@@ -1,12 +1,8 @@
 package pl.lotto.domain.numberreceiver;
 
-import java.time.Clock;
+import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
 
 class NumberReceiverConfiguration {
-
-    Clock clock() {
-        return Clock.systemUTC();
-    }
 
     HashGenerator hashGenerator() {
         return new HashGenerator();
@@ -14,16 +10,15 @@ class NumberReceiverConfiguration {
 
     NumberReceiverFacade numberReceiverFacade(
             IHashGenerable hashGenerator,
-            Clock clock,
-            INumberReceiverRepository numberReceiverRepository
+            INumberReceiverRepository numberReceiverRepository,
+            DrawDateGeneratorFacade drawDateGeneratorFacade
     ) {
         NumberValidator numberValidator = new NumberValidator();
-        DrawDataGenerator drawDataGenerator = new DrawDataGenerator(clock);
         return new NumberReceiverFacade(
                 numberValidator,
                 numberReceiverRepository,
                 hashGenerator,
-                drawDataGenerator
+                drawDateGeneratorFacade
         );
     }
 

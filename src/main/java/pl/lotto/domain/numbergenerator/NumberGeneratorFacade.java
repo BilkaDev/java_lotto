@@ -1,9 +1,9 @@
 package pl.lotto.domain.numbergenerator;
 
 import lombok.AllArgsConstructor;
+import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
 import pl.lotto.domain.numbergenerator.dto.SixRandomNumbersDto;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
-import pl.lotto.domain.numberreceiver.NumberReceiverFacade;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -11,12 +11,13 @@ import java.util.Set;
 @AllArgsConstructor
 public class NumberGeneratorFacade {
     private final IRandomNumberGenerable randomNumberGenerable;
-    private final NumberReceiverFacade numberReceiverFacade;
     private final IWinningNumbersValidator winningNumbersValidator;
     private final IWinningNumbersRepository winningNumbersRepository;
+    private final DrawDateGeneratorFacade drawDateGeneratorFacade;
 
     public WinningNumbersDto generateWinningNumbers() {
-        LocalDateTime nextDrawDate = numberReceiverFacade.retrieveNextDrawDate();
+        LocalDateTime nextDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
+
         SixRandomNumbersDto sixRandomNumbersDto = randomNumberGenerable.generateSixRandomNumbers();
         Set<Integer> winningNumbers = sixRandomNumbersDto.numbers();
 
@@ -44,7 +45,7 @@ public class NumberGeneratorFacade {
     }
 
     public boolean areWinningNumbersGeneratedByDate() {
-        LocalDateTime nextDrawDate = numberReceiverFacade.retrieveNextDrawDate();
+        LocalDateTime nextDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
         return winningNumbersRepository.existsByDate(nextDrawDate);
     }
 }

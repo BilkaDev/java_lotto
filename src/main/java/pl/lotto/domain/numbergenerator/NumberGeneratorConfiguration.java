@@ -1,19 +1,19 @@
 package pl.lotto.domain.numbergenerator;
 
-import pl.lotto.domain.numberreceiver.NumberReceiverFacade;
+import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
 
 class NumberGeneratorConfiguration {
 
     NumberGeneratorFacade numberGeneratorFacade(
             IRandomNumberGenerable randomNumberGenerable,
-            NumberReceiverFacade numberReceiverFacade,
-            IWinningNumbersRepository winningNumbersRepository
+            IWinningNumbersRepository winningNumbersRepository,
+            DrawDateGeneratorFacade drawDateGeneratorFacade
     ) {
         return new NumberGeneratorFacade(
                 randomNumberGenerable,
-                numberReceiverFacade,
                 new WinningWinningNumbersValidator(),
-                winningNumbersRepository
+                winningNumbersRepository,
+                drawDateGeneratorFacade
         );
     }
 }
