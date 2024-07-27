@@ -1,7 +1,251 @@
 package pl.lotto.domain.numberreceiver;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import pl.lotto.domain.AdjustableClock;
+import pl.lotto.domain.numberreceiver.dto.NumberReceiverResponseDto;
+import pl.lotto.domain.numberreceiver.dto.TicketDto;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NumberReceiverFacadeTest {
+    // given
+    IHashGenerable hashGenerator = new HashGeneratorTestImpl();
+    AdjustableClock clock = new AdjustableClock(
+            LocalDateTime.of(2024, 7, 27, 10, 0, 0).toInstant(ZoneOffset.UTC),
+            ZoneId.of("UTC")
+    );
+    INumberReceiverRepository numberReceiverRepository = new InMemoryNumberReceiverRepositoryTestImpl();
+    NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
+            hashGenerator,
+            clock,
+            numberReceiverRepository
+    );
 
+
+    @Test
+    public void should_return_success_when_user_gave_six_numbers() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 99);
+        DrawDataGenerator drawDataGenerator = new DrawDataGenerator(clock);
+        LocalDateTime nextDrawDate = drawDataGenerator.getNextDrawDate();
+
+        TicketDto generatedTicket = TicketDto.builder()
+                .hash(hashGenerator.getHash())
+                .drawDate(nextDrawDate)
+                .numbersFromUsers(numbersFromUser)
+                .build();
+
+        // when
+        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+
+        // then
+        NumberReceiverResponseDto expected = NumberReceiverResponseDto.builder()
+                .ticketDto(
+                        generatedTicket
+                )
+                .message(ValidationResult.INPUT_SUCCESS.info)
+                .build();
+        assertThat(result.message()).isEqualTo(ValidationResult.INPUT_SUCCESS.info);
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void should_return_failed_when_user_gave_less_than_six_numbers() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5);
+        // when
+        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        // then
+        assertThat(result.message()).isEqualTo(ValidationResult.NOT_SIX_NUMBERS_GIVEN.info);
+    }
+
+    @Test
+    public void should_return_failed_when_user_gave_more_than_six_numbers() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6, 7);
+        // when
+        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        // then
+        assertThat(result.message()).isEqualTo(ValidationResult.NOT_SIX_NUMBERS_GIVEN.info);
+    }
+
+    @Test
+    public void should_return_failed_when_user_gave_at_least_one_number_out_of_range_of_1_99() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(100, 2, 3, 4, 5, 6);
+        // when
+        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        // then
+        assertThat(result.message()).isEqualTo(ValidationResult.NOT_IN_RANGE.info);
+    }
+
+    @Test
+    public void should_return_correct_hash() {
+        // given
+        IHashGenerable hashGenerator = new HashGenerator();
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
+                hashGenerator, clock, numberReceiverRepository);
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
+
+        // when
+        String response = numberReceiverFacade.inputNumbers(numbersFromUser).ticketDto().hash();
+
+        // then
+        assertThat(response).hasSize(8);
+        assertThat(response).isNotNull();
+    }
+
+    @Test
+    public void should_return_correct_draw_date() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
+
+        // when
+        LocalDateTime testedDrawDate = numberReceiverFacade.inputNumbers(numbersFromUser).ticketDto().drawDate();
+
+        // then
+        LocalDateTime expectedDrawDate = LocalDateTime.of(2024, 7, 27, 12, 0, 0);
+        assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
+    }
+
+    @Test
+    public void should_return_next_Saturday_draw_date_when_date_is_Saturday_noon() {
+        // given
+        clock.plusMinutes(120);
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
+
+        // when
+        LocalDateTime testedDrawDate = numberReceiverFacade.inputNumbers(numbersFromUser).ticketDto().drawDate();
+
+        // then
+
+        LocalDateTime expectedDrawDate = LocalDateTime.of(2024, 8, 3, 12, 0, 0);
+
+        assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
+    }
+
+    @Test
+    public void should_return_next_Saturday_draw_date_when_date_is_Saturday_afternoon() {
+        // given
+        clock.plusMinutes(240);
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
+
+        // when
+        LocalDateTime testedDrawDate = numberReceiverFacade.inputNumbers(numbersFromUser).ticketDto().drawDate();
+
+        // then
+
+        LocalDateTime expectedDrawDate = LocalDateTime.of(2024, 8, 3, 12, 0, 0);
+
+        assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
+    }
+
+    @Test
+    public void should_return_save_to_database_when_user_gave_six_numbers() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 7);
+        LocalDateTime drawDate = LocalDateTime.of(2024, 7, 27, 12, 0, 0)
+                .toInstant(ZoneOffset.UTC).atZone(ZoneId.of("UTC")).toLocalDateTime();
+        // when
+        NumberReceiverResponseDto numberReceiverResponseDto = numberReceiverFacade.inputNumbers(numbersFromUser);
+        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByNextDrawDate(drawDate);
+        // then
+        assertThat(ticketDtos).contains(
+                TicketDto.builder()
+                        .hash(numberReceiverResponseDto.ticketDto().hash())
+                        .drawDate(drawDate)
+                        .numbersFromUsers(numbersFromUser)
+                        .build()
+        );
+    }
+
+
+    @Test
+    public void should_return_tickets_with_correct_draw_date() {
+        // given
+        IHashGenerable hashGenerator = new HashGenerator();
+
+        Instant fixedInstant = LocalDateTime.of(2024, 7, 25, 12, 0, 0).toInstant(ZoneOffset.UTC);
+        ZoneId of = ZoneId.of("UTC");
+        AdjustableClock clock = new AdjustableClock(fixedInstant, of);
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(hashGenerator, clock, numberReceiverRepository);
+        NumberReceiverResponseDto numberReceiverResponseDto = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
+        clock.plusDays(1);
+        NumberReceiverResponseDto numberReceiverResponseDto1 = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
+        clock.plusDays(1);
+        NumberReceiverResponseDto numberReceiverResponseDto2 = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
+        clock.plusDays(1);
+        NumberReceiverResponseDto numberReceiverResponseDto3 = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
+        TicketDto ticketDto = numberReceiverResponseDto.ticketDto();
+        TicketDto ticketDto1 = numberReceiverResponseDto1.ticketDto();
+        LocalDateTime drawDate = numberReceiverResponseDto.ticketDto().drawDate();
+        // when
+        List<TicketDto> allTicketsByDate = numberReceiverFacade.retrieveAllTicketsByNextDrawDate(drawDate);
+        // then
+        assertThat(allTicketsByDate).containsOnly(ticketDto, ticketDto1);
+    }
+
+    @Test
+    public void it_should_return_empty_collections_if_there_are_no_tickets() {
+        // given
+        clock.plusMinutes(120);
+        LocalDateTime drawDate = LocalDateTime.now(clock);
+
+        // when
+        List<TicketDto> allTicketsByDate = numberReceiverFacade.retrieveAllTicketsByNextDrawDate(drawDate);
+        // then
+        assertThat(allTicketsByDate).isEmpty();
+    }
+
+    @Test
+    public void it_should_return_empty_collections_if_given_date_is_after_next_drawDate() {
+        // given
+        NumberReceiverResponseDto numberReceiverResponseDto = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
+
+        LocalDateTime drawDate = numberReceiverResponseDto.ticketDto().drawDate();
+
+        // when
+        List<TicketDto> allTicketsByDate = numberReceiverFacade.retrieveAllTicketsByNextDrawDate(drawDate.plusWeeks(1L));
+        // then
+        assertThat(allTicketsByDate).isEmpty();
+    }
+
+    @Test
+    public void should_return_next_draw_date() {
+        // given
+        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(hashGenerator, clock, numberReceiverRepository);
+
+        // when
+        LocalDateTime testedDrawDate = numberReceiverFacade.retrieveNextDrawDate();
+
+        // then
+        LocalDateTime expectedDrawDate = LocalDateTime.of(2022, 11, 19, 12, 0, 0);
+        assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
+    }
+
+    @Test
+    public void should_return_ticket_by_hash() {
+        // given
+        Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 99);
+        NumberReceiverResponseDto savedTicket = numberReceiverFacade.inputNumbers(numbersFromUser);
+
+        // when
+        TicketDto result = numberReceiverFacade.retrieveTicketByHash(savedTicket.ticketDto().hash());
+
+        // then
+        assertThat(result).isEqualTo(savedTicket.ticketDto());
+    }
+
+    @Test
+    public void should_throw_exception_when_hash_dont_exist() {
+        assertThrows(TicketNotFoundException.class, () -> numberReceiverFacade.retrieveTicketByHash("notExistingHash"));
+    }
 }
