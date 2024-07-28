@@ -35,7 +35,7 @@ class NumberGeneratorFacadeTest {
     public void should_return_set_of_required_size() {
         // given
         NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacade(
-                new RandomNumbersGenerator(),
+                new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
         );
@@ -51,7 +51,7 @@ class NumberGeneratorFacadeTest {
     public void should_return_set_of_required_size_within_required_range() {
         // given
         NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacade(
-                new RandomNumbersGenerator(),
+                new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
         );
