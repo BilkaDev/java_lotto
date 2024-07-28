@@ -17,7 +17,7 @@ public class WinningNumberGeneratorTestImpl implements IRandomNumberGenerable {
     }
 
     @Override
-    public SixRandomNumbersDto generateSixRandomNumbers() {
+    public SixRandomNumbersDto generateSixRandomNumbers(int count, int lowerBand, int upperBand) {
         return SixRandomNumbersDto.builder()
                 .numbers(numbers)
                 .build();
