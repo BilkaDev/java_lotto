@@ -14,11 +14,13 @@ public class NumberGeneratorFacade {
     private final IWinningNumbersValidator winningNumbersValidator;
     private final IWinningNumbersRepository winningNumbersRepository;
     private final DrawDateGeneratorFacade drawDateGeneratorFacade;
+    private final NumberGeneratorFacadeConfigurationProperties properties;
 
     public WinningNumbersDto generateWinningNumbers() {
         LocalDateTime nextDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
 
-        SixRandomNumbersDto sixRandomNumbersDto = randomNumberGenerable.generateSixRandomNumbers();
+        SixRandomNumbersDto sixRandomNumbersDto = randomNumberGenerable
+                .generateSixRandomNumbers(properties.count(), properties.lowerBand(), properties.upperBand());
         Set<Integer> winningNumbers = sixRandomNumbersDto.numbers();
 
         winningNumbersValidator.validate(winningNumbers);
@@ -46,6 +48,6 @@ public class NumberGeneratorFacade {
 
     public boolean areWinningNumbersGeneratedByDate() {
         LocalDateTime nextDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
-        return winningNumbersRepository.existsByDate(nextDrawDate);
+        return winningNumbersRepository.existsByDrawDate(nextDrawDate);
     }
 }
