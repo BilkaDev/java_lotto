@@ -14,6 +14,7 @@ class NumberValidator implements INumberValidator {
 
     @Override
     public String validation(Set<Integer> numbersFromUser) {
+        errors = new ArrayList<>();
         if (!areNumbersInRange(numbersFromUser)) {
             errors.add(ValidationResult.NOT_IN_RANGE);
         }
