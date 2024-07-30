@@ -1,10 +1,13 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   data:
     mongodb:
       uri: ${MONGO_URI}
 
 lotto:
   number-generator:
+    lotteryRunOccurrencesCron: "0 0 12 * * 6" # every Saturday at 12:00
     facade:
       count: 25
       lowerBand: 1
