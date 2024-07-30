@@ -4,6 +4,9 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 lotto:
   number-generator:
