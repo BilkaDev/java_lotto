@@ -15,7 +15,7 @@ import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
 @RequestMapping("/api/v1/results")
 @AllArgsConstructor
 @Log4j2
-public class ResultAnnouncerController {
+public class ResultAnnouncerRestController {
     private final ResultAnnouncerFacade resultAnnouncerFacade;
 
     @GetMapping("/{id}")
@@ -38,8 +38,8 @@ public class ResultAnnouncerController {
                 .build();
     }
 
-    private static ResultDto buildResult(ResponseDto responseDto) {
-        return ResultDto
+    private static CheckResultDto buildResult(ResponseDto responseDto) {
+        return CheckResultDto
                 .builder()
                 .hitNumbers(responseDto.hitNumbers())
                 .hash(responseDto.hash())
