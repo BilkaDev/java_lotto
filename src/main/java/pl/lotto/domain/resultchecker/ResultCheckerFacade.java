@@ -15,7 +15,7 @@ import java.util.Set;
 public class ResultCheckerFacade {
     private final NumberReceiverFacade numberReceiverFacade;
     private final NumberGeneratorFacade numberGeneratorFacade;
-    private final PlayerRepository playerRepository;
+    private final IPlayerRepository playerRepository;
     private final WinnerGenerator winnerGenerator;
 
     public PlayersDto generateResults() {
