@@ -18,7 +18,9 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
@@ -82,10 +84,31 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         );
 
 
-        // step 4: 3 days and 1 minute passed, and it is 1 minute after draw date: 30.07.2024 12:01 Saturday
-        // step 5: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday
-        // step 6: 3 hours passed, and it is 1 minute after announcement time (27.07.2024 15:01 Saturday)
-        // step 7: user made GET /results/sampleTicketId and system returned ok(200)
+        // step 4: user made GET /results/notExistingTicketId and system returned not found(404) and with
+        // (message: "Not found for id: notExistingId", and status: "NOT_FOUND")
+        // when
+        ResultActions getResultNotFoundId = mockMvc.perform(get("/api/v1/results/notExistingId")
+                .contentType(MediaType.APPLICATION_JSON));
+        // then
+        getResultNotFoundId
+                .andExpect(status().isNotFound())
+                .andExpect(content()
+                        .json("""
+                                {
+                                    "messages":["Not found for id: notExistingId"],
+                                    "status":"NOT_FOUND",
+                                    "code":"PLAYER_RESULT_NOT_FOUND"
+                                }
+                                """.trim())
+                );
+
+
+        // step 5: 3 days and 1 minute passed, and it is 1 minute after draw date: 30.07.2024 12:01 Saturday
+
+
+        // step 6: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday
+        // step 7: 3 hours passed, and it is 1 minute after announcement time (27.07.2024 15:01 Saturday)
+        // step 9: user made GET /results/sampleTicketId and system returned ok(200)
 
 
     }

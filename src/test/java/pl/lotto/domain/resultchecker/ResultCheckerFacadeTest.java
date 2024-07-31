@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ResultCheckerFacadeTest {
-    private final PlayerRepository playerRepository = new PlayerRepositoryTestImpl();
+    private final IPlayerRepository playerRepository = new PlayerRepositoryTestImpl();
     private final NumberGeneratorFacade winningNumbersGeneratorFacade = mock(NumberGeneratorFacade.class);
     private final NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
