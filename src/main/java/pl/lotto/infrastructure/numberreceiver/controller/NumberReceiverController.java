@@ -1,5 +1,6 @@
 package pl.lotto.infrastructure.numberreceiver.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class NumberReceiverController {
 
     @PostMapping("/inputNumbers")
     public ResponseEntity<InputNumbersResponseDto> inputNumbers(
-            @RequestBody InputNumbersRequestDto numbersDto
+            @RequestBody @Valid InputNumbersRequestDto numbersDto
     ) {
         log.info("Start POST inputNumbers");
         Set<Integer> numbers = new HashSet<>(numbersDto.numbers());
