@@ -13,7 +13,7 @@ class NumberReceiverConfiguration {
     }
 
     @Bean
-    NumberReceiverFacade numberReceiverFacade(
+    INumberReceiverFacade numberReceiverFacade(
             IHashGenerable hashGenerator,
             INumberReceiverRepository numberReceiverRepository,
             IDrawDateGeneratorFacade drawDateGeneratorFacade

@@ -25,7 +25,7 @@ class NumberReceiverFacadeTest {
 
     INumberReceiverRepository numberReceiverRepository = new InMemoryNumberReceiverRepositoryTestImpl();
     IDrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
-    NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
+    INumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
             hashGenerator,
             numberReceiverRepository,
             drawDateGeneratorFacade
@@ -102,7 +102,7 @@ class NumberReceiverFacadeTest {
     public void should_return_correct_hash() {
         // given
         IHashGenerable hashGenerator = new HashGenerator();
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
+        INumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
                 hashGenerator, numberReceiverRepository, drawDateGeneratorFacade);
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
 
@@ -148,7 +148,7 @@ class NumberReceiverFacadeTest {
                 date
         ).build());
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(hashGenerator, numberReceiverRepository, drawDateGeneratorFacade);
+        INumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(hashGenerator, numberReceiverRepository, drawDateGeneratorFacade);
 
         NumberReceiverResponseDto numberReceiverResponseDto = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
         NumberReceiverResponseDto numberReceiverResponseDto1 = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));

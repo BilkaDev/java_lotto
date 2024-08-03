@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import pl.lotto.domain.numbergenerator.INumberGeneratorFacade;
 import pl.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
+import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
 import pl.lotto.domain.numberreceiver.NumberReceiverFacade;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 import pl.lotto.domain.resultchecker.dto.PlayersDto;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 class ResultCheckerFacadeTest {
     private final IPlayerRepository playerRepository = new PlayerRepositoryTestImpl();
     private final INumberGeneratorFacade winningNumbersGeneratorFacade = mock(NumberGeneratorFacade.class);
-    private final NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
+    private final INumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
     @Test
     public void it_should_generate_all_players_with_correct_message() {

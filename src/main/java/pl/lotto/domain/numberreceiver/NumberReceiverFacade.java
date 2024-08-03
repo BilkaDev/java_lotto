@@ -18,12 +18,13 @@ import java.util.Set;
 - user got a unique coupon
 * */
 @AllArgsConstructor
-public class NumberReceiverFacade {
+public class NumberReceiverFacade implements INumberReceiverFacade {
     private INumberValidator numberValidator;
     private INumberReceiverRepository numberReceiverRepository;
     private IHashGenerable hashGenerator;
     private IDrawDateGeneratorFacade drawDateGenerator;
 
+    @Override
     public NumberReceiverResponseDto inputNumbers(Set<Integer> numbersFromUser) {
 
         String validationResult = numberValidator.validation(numbersFromUser);
@@ -47,11 +48,13 @@ public class NumberReceiverFacade {
                 .build();
     }
 
+    @Override
     public List<TicketDto> retrieveAllTicketsByNextDrawDate() {
         LocalDateTime nextDrawDate = drawDateGenerator.retrieveNextDrawDate().drawDate();
         return retrieveAllTicketsByNextDrawDate(nextDrawDate);
     }
 
+    @Override
     public List<TicketDto> retrieveAllTicketsByNextDrawDate(LocalDateTime drawDate) {
         LocalDateTime nextDrawDate = drawDateGenerator.retrieveNextDrawDate().drawDate();
         if (drawDate.isAfter(nextDrawDate)) {
@@ -63,6 +66,7 @@ public class NumberReceiverFacade {
                 .toList();
     }
 
+    @Override
     public TicketDto retrieveTicketByHash(String hash) {
         return numberReceiverRepository.findByHash(hash)
                 .map(TicketMapper::mapFromTicket)

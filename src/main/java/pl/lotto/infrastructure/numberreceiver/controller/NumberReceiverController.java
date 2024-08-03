@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lotto.domain.numberreceiver.NumberReceiverFacade;
+import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
 import pl.lotto.domain.numberreceiver.dto.NumberReceiverResponseDto;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 
@@ -20,7 +20,7 @@ import java.util.Set;
 @Log4j2
 @AllArgsConstructor
 public class NumberReceiverController {
-    private final NumberReceiverFacade numberReceiverFacade;
+    private final INumberReceiverFacade numberReceiverFacade;
 
     @PostMapping("/inputNumbers")
     public ResponseEntity<InputNumbersResponseDto> inputNumbers(
