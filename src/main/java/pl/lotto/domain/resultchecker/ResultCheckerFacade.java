@@ -1,9 +1,9 @@
 package pl.lotto.domain.resultchecker;
 
 import lombok.AllArgsConstructor;
-import pl.lotto.domain.numbergenerator.NumberGeneratorFacade;
+import pl.lotto.domain.numbergenerator.INumberGeneratorFacade;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
-import pl.lotto.domain.numberreceiver.NumberReceiverFacade;
+import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 import pl.lotto.domain.resultchecker.dto.PlayersDto;
 import pl.lotto.domain.resultchecker.dto.ResultDto;
@@ -13,8 +13,8 @@ import java.util.Set;
 
 @AllArgsConstructor
 public class ResultCheckerFacade {
-    private final NumberReceiverFacade numberReceiverFacade;
-    private final NumberGeneratorFacade numberGeneratorFacade;
+    private final INumberReceiverFacade numberReceiverFacade;
+    private final INumberGeneratorFacade numberGeneratorFacade;
     private final IPlayerRepository playerRepository;
     private final WinnerGenerator winnerGenerator;
 

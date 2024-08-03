@@ -9,7 +9,7 @@ import java.time.Clock;
 @Configuration
 class ResultAnnouncerConfiguration {
     @Bean
-    ResultAnnouncerFacade resultAnnouncerFacade(
+    IResultAnnouncerFacade resultAnnouncerFacade(
             ResultResponseRepository resultResponseRepository,
             ResultCheckerFacade resultCheckerFacade,
             Clock clock
@@ -21,7 +21,7 @@ class ResultAnnouncerConfiguration {
         );
     }
 
-    ResultAnnouncerFacade createForTest(
+    IResultAnnouncerFacade createForTest(
             ResultResponseRepository resultResponseRepository,
             ResultCheckerFacade resultCheckerFacade,
             Clock clock

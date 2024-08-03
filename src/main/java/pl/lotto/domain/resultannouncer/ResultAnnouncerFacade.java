@@ -13,11 +13,12 @@ import java.util.Optional;
 import static pl.lotto.domain.resultannouncer.MessageResponse.*;
 
 @AllArgsConstructor
-public class ResultAnnouncerFacade {
+public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
     private final ResultResponseRepository resultResponseRepository;
     private final ResultCheckerFacade resultCheckerFacade;
     private final Clock clock;
 
+    @Override
     public ResultResponseDto checkResult(String hash) {
         if (resultResponseRepository.existsById(hash)) {
             Optional<ResultResponse> resultResponseCached = resultResponseRepository.findById(hash);

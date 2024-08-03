@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.lotto.domain.resultannouncer.ResultAnnouncerFacade;
+import pl.lotto.domain.resultannouncer.IResultAnnouncerFacade;
 import pl.lotto.domain.resultannouncer.dto.ResponseDto;
 import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
 
@@ -16,7 +16,7 @@ import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
 @AllArgsConstructor
 @Log4j2
 public class ResultAnnouncerRestController {
-    private final ResultAnnouncerFacade resultAnnouncerFacade;
+    private final IResultAnnouncerFacade resultAnnouncerFacade;
 
     @GetMapping("/{id}")
     public ResponseEntity<CheckResultResponseDto> checkResultsById(

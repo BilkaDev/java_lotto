@@ -6,9 +6,11 @@ import pl.lotto.domain.drawdategenerator.dto.DrawDateDto;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
-public class DrawDateGeneratorFacade {
+public class DrawDateGeneratorFacade implements IDrawDateGeneratorFacade {
+
     private final IDrawDateGenerable drawDataGenerator;
 
+    @Override
     public DrawDateDto retrieveNextDrawDate() {
         LocalDateTime nextDrawDate = drawDataGenerator.getNextDrawDate();
         return DrawDateDto.builder()

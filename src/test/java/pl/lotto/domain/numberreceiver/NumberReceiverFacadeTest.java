@@ -3,6 +3,7 @@ package pl.lotto.domain.numberreceiver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 import pl.lotto.domain.drawdategenerator.dto.DrawDateDto;
 import pl.lotto.domain.numberreceiver.dto.NumberReceiverResponseDto;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
@@ -23,8 +24,8 @@ class NumberReceiverFacadeTest {
     IHashGenerable hashGenerator = new HashGeneratorTestImpl();
 
     INumberReceiverRepository numberReceiverRepository = new InMemoryNumberReceiverRepositoryTestImpl();
-    DrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
-    NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
+    IDrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
+    INumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
             hashGenerator,
             numberReceiverRepository,
             drawDateGeneratorFacade
@@ -101,7 +102,7 @@ class NumberReceiverFacadeTest {
     public void should_return_correct_hash() {
         // given
         IHashGenerable hashGenerator = new HashGenerator();
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
+        INumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
                 hashGenerator, numberReceiverRepository, drawDateGeneratorFacade);
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
 
@@ -112,7 +113,6 @@ class NumberReceiverFacadeTest {
         assertThat(response).hasSize(8);
         assertThat(response).isNotNull();
     }
-
 
 
     @Test
@@ -145,10 +145,10 @@ class NumberReceiverFacadeTest {
 
         LocalDateTime date = LocalDateTime.of(2024, 7, 27, 12, 0, 0);
         when(drawDateGeneratorFacade.retrieveNextDrawDate()).thenReturn(DrawDateDto.builder().drawDate(
-               date
+                date
         ).build());
 
-        NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(hashGenerator, numberReceiverRepository, drawDateGeneratorFacade);
+        INumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(hashGenerator, numberReceiverRepository, drawDateGeneratorFacade);
 
         NumberReceiverResponseDto numberReceiverResponseDto = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));
         NumberReceiverResponseDto numberReceiverResponseDto1 = numberReceiverFacade.inputNumbers(Set.of(1, 2, 3, 4, 5, 6));

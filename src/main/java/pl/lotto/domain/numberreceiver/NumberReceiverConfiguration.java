@@ -2,7 +2,7 @@ package pl.lotto.domain.numberreceiver;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 
 @Configuration
 class NumberReceiverConfiguration {
@@ -13,10 +13,10 @@ class NumberReceiverConfiguration {
     }
 
     @Bean
-    NumberReceiverFacade numberReceiverFacade(
+    INumberReceiverFacade numberReceiverFacade(
             IHashGenerable hashGenerator,
             INumberReceiverRepository numberReceiverRepository,
-            DrawDateGeneratorFacade drawDateGeneratorFacade
+            IDrawDateGeneratorFacade drawDateGeneratorFacade
     ) {
         NumberValidator numberValidator = new NumberValidator();
         return new NumberReceiverFacade(

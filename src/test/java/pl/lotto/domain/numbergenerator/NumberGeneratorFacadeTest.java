@@ -3,6 +3,7 @@ package pl.lotto.domain.numbergenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 import pl.lotto.domain.drawdategenerator.dto.DrawDateDto;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 class NumberGeneratorFacadeTest {
     private final IWinningNumbersRepository winningNumbersRepository = new WinningWinningNumbersRepositoryImplTest();
 
-    DrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
+    IDrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
 
     @BeforeEach
     public void setUp() {
@@ -34,7 +35,7 @@ class NumberGeneratorFacadeTest {
     @Test
     public void should_return_set_of_required_size() {
         // given
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -50,7 +51,7 @@ class NumberGeneratorFacadeTest {
     @Test
     public void should_return_set_of_required_size_within_required_range() {
         // given
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -70,7 +71,7 @@ class NumberGeneratorFacadeTest {
     public void should_throw_exception_when_size_is_bigger_than_required() {
         // given
         Set<Integer> numbersOutOfRange = Set.of(1, 2, 3, 4, 5, 6, 7);
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(numbersOutOfRange),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -83,7 +84,7 @@ class NumberGeneratorFacadeTest {
     public void should_throw_exception_when_size_is_lower_than_required() {
         // given
         Set<Integer> numbersOutOfRange = Set.of(1, 2, 3, 4, 5);
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(numbersOutOfRange),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -96,7 +97,7 @@ class NumberGeneratorFacadeTest {
     public void should_throw_exception_when_required_size_is_bigger_than_range() {
         // given
         Set<Integer> numbersOutOfRange = Set.of(1, 2, 3, 4, 5, 100);
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(numbersOutOfRange),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -108,7 +109,7 @@ class NumberGeneratorFacadeTest {
     @Test
     public void should_return_collections_of_unique_values() {
         //given
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -132,7 +133,7 @@ class NumberGeneratorFacadeTest {
                 .drawDate(drawDate)
                 .build();
         winningNumbersRepository.save(winningNumbers);
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -158,7 +159,7 @@ class NumberGeneratorFacadeTest {
     public void it_should_throw_an_exception_when_fail_to_retrieve_numbers_by_given_date() {
         //given
         LocalDateTime drawDate = LocalDateTime.of(2022, 12, 17, 12, 0, 0);
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
@@ -190,7 +191,7 @@ class NumberGeneratorFacadeTest {
                         .drawDate(drawDate)
                         .build()
         );
-        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
+        INumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().createForTest(
                 new WinningNumberGeneratorTestImpl(),
                 winningNumbersRepository,
                 drawDateGeneratorFacade
