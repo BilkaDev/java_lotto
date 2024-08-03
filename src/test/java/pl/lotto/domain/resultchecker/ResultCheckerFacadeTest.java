@@ -1,6 +1,7 @@
 package pl.lotto.domain.resultchecker;
 
 import org.junit.jupiter.api.Test;
+import pl.lotto.domain.numbergenerator.INumberGeneratorFacade;
 import pl.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 import pl.lotto.domain.numberreceiver.NumberReceiverFacade;
@@ -18,7 +19,7 @@ import static org.mockito.Mockito.when;
 
 class ResultCheckerFacadeTest {
     private final IPlayerRepository playerRepository = new PlayerRepositoryTestImpl();
-    private final NumberGeneratorFacade winningNumbersGeneratorFacade = mock(NumberGeneratorFacade.class);
+    private final INumberGeneratorFacade winningNumbersGeneratorFacade = mock(NumberGeneratorFacade.class);
     private final NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
     @Test

@@ -9,13 +9,14 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @AllArgsConstructor
-public class NumberGeneratorFacade {
+public class NumberGeneratorFacade implements INumberGeneratorFacade {
     private final IRandomNumberGenerable randomNumberGenerable;
     private final IWinningNumbersValidator winningNumbersValidator;
     private final IWinningNumbersRepository winningNumbersRepository;
     private final IDrawDateGeneratorFacade drawDateGeneratorFacade;
     private final NumberGeneratorFacadeConfigurationProperties properties;
 
+    @Override
     public WinningNumbersDto generateWinningNumbers() {
         LocalDateTime nextDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
 
@@ -36,6 +37,7 @@ public class NumberGeneratorFacade {
                 .build();
     }
 
+    @Override
     public WinningNumbersDto retrieveWinningNumbersByDate(LocalDateTime drawDate) {
         WinningNumbers winningNumbers = winningNumbersRepository.findByDrawDate(drawDate)
                 .orElseThrow(WinningNumbersNotFoundException::new);
@@ -46,6 +48,7 @@ public class NumberGeneratorFacade {
 
     }
 
+    @Override
     public boolean areWinningNumbersGeneratedByDate() {
         LocalDateTime nextDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
         return winningNumbersRepository.existsByDrawDate(nextDrawDate);

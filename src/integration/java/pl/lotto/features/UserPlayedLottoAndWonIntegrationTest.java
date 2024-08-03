@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import pl.lotto.BaseIntegrationTest;
-import pl.lotto.domain.numbergenerator.NumberGeneratorFacade;
+import pl.lotto.domain.numbergenerator.INumberGeneratorFacade;
 import pl.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
 import pl.lotto.domain.resultchecker.ResultCheckerFacade;
 import pl.lotto.domain.resultchecker.dto.ResultDto;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
     @Autowired
-    public NumberGeneratorFacade numberGeneratorFacade;
+    public INumberGeneratorFacade numberGeneratorFacade;
 
     @Autowired
     public ResultCheckerFacade resultCheckerFacade;

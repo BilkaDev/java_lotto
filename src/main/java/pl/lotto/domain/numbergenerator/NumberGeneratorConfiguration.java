@@ -8,7 +8,7 @@ import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 class NumberGeneratorConfiguration {
 
     @Bean
-    NumberGeneratorFacade numberGeneratorFacade(
+    INumberGeneratorFacade numberGeneratorFacade(
             IRandomNumberGenerable randomNumberGenerable,
             IWinningNumbersRepository winningNumbersRepository,
             IDrawDateGeneratorFacade drawDateGeneratorFacade,
@@ -24,7 +24,7 @@ class NumberGeneratorConfiguration {
         );
     }
 
-    NumberGeneratorFacade createForTest(
+    INumberGeneratorFacade createForTest(
             IRandomNumberGenerable randomNumberGenerable,
             IWinningNumbersRepository winningNumbersRepository,
             IDrawDateGeneratorFacade drawDateGeneratorFacade
