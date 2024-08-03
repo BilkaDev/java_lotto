@@ -8,7 +8,7 @@ import pl.lotto.domain.AdjustableClock;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 @Configuration
 @Profile("integration")
@@ -17,6 +17,6 @@ public class IntegrationConfiguration {
     @Bean
     @Primary
     AdjustableClock clock() {
-        return AdjustableClock.ofLocalDateAndLocalTime(LocalDate.of(2024, 7, 24), LocalTime.of(10, 0), ZoneId.systemDefault());
+        return AdjustableClock.ofLocalDateAndLocalTime(LocalDate.of(2024, 7, 24), LocalTime.of(11, 0), ZoneOffset.UTC);
     }
 }

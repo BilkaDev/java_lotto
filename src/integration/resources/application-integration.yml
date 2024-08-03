@@ -1,3 +1,5 @@
 lotto:
   number-generator:
-    lotteryRunOccurrencesCron: "*/2 * * * * *"
+    lotteryRunOccurrencesCron: "*/5 * * * * *"
+  result-checker:
+    resultCheckOccurrencesCron: "*/7 * * * * *"
