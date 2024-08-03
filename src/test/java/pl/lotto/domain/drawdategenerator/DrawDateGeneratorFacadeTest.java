@@ -18,7 +18,7 @@ class DrawDateGeneratorFacadeTest {
     @Test
     public void should_return_next_draw_date() {
         // given
-        DrawDateGeneratorFacade drawDateGeneratorFacade = new DrawDateGeneratorConfiguration().drawDateGeneratorFacade(clock);
+        IDrawDateGeneratorFacade drawDateGeneratorFacade = new DrawDateGeneratorConfiguration().drawDateGeneratorFacade(clock);
 
         // when
         LocalDateTime testedDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
@@ -32,7 +32,7 @@ class DrawDateGeneratorFacadeTest {
     public void should_return_next_Saturday_draw_date_when_date_is_Saturday_noon() {
         // given
         clock.plusMinutes(118);
-        DrawDateGeneratorFacade drawDateGeneratorFacade = new DrawDateGeneratorConfiguration().drawDateGeneratorFacade(clock);
+        IDrawDateGeneratorFacade drawDateGeneratorFacade = new DrawDateGeneratorConfiguration().drawDateGeneratorFacade(clock);
 
         // when
         LocalDateTime testedDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();
@@ -49,7 +49,7 @@ class DrawDateGeneratorFacadeTest {
     public void should_return_next_Saturday_draw_date_when_date_is_Saturday_afternoon() {
         // given
         clock.plusMinutes(238);
-        DrawDateGeneratorFacade drawDateGeneratorFacade = new DrawDateGeneratorConfiguration().drawDateGeneratorFacade(clock);
+        IDrawDateGeneratorFacade drawDateGeneratorFacade = new DrawDateGeneratorConfiguration().drawDateGeneratorFacade(clock);
 
         // when
         LocalDateTime testedDrawDate = drawDateGeneratorFacade.retrieveNextDrawDate().drawDate();

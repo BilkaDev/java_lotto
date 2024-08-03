@@ -14,7 +14,7 @@ class DrawDateGeneratorConfiguration {
     }
 
     @Bean
-    DrawDateGeneratorFacade drawDateGeneratorFacade(Clock clock) {
+    IDrawDateGeneratorFacade drawDateGeneratorFacade(Clock clock) {
         return new DrawDateGeneratorFacade(new DrawDateGenerator(clock));
     }
 }

@@ -1,7 +1,7 @@
 package pl.lotto.domain.numberreceiver;
 
 import lombok.AllArgsConstructor;
-import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 import pl.lotto.domain.numberreceiver.dto.NumberReceiverResponseDto;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 
@@ -22,7 +22,7 @@ public class NumberReceiverFacade {
     private INumberValidator numberValidator;
     private INumberReceiverRepository numberReceiverRepository;
     private IHashGenerable hashGenerator;
-    private DrawDateGeneratorFacade drawDateGenerator;
+    private IDrawDateGeneratorFacade drawDateGenerator;
 
     public NumberReceiverResponseDto inputNumbers(Set<Integer> numbersFromUser) {
 

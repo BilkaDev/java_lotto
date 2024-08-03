@@ -3,6 +3,7 @@ package pl.lotto.domain.numbergenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 import pl.lotto.domain.drawdategenerator.dto.DrawDateDto;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 class NumberGeneratorFacadeTest {
     private final IWinningNumbersRepository winningNumbersRepository = new WinningWinningNumbersRepositoryImplTest();
 
-    DrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
+    IDrawDateGeneratorFacade drawDateGeneratorFacade = mock(DrawDateGeneratorFacade.class);
 
     @BeforeEach
     public void setUp() {

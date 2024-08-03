@@ -1,7 +1,7 @@
 package pl.lotto.domain.numbergenerator;
 
 import lombok.AllArgsConstructor;
-import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 import pl.lotto.domain.numbergenerator.dto.SixRandomNumbersDto;
 import pl.lotto.domain.numbergenerator.dto.WinningNumbersDto;
 
@@ -13,7 +13,7 @@ public class NumberGeneratorFacade {
     private final IRandomNumberGenerable randomNumberGenerable;
     private final IWinningNumbersValidator winningNumbersValidator;
     private final IWinningNumbersRepository winningNumbersRepository;
-    private final DrawDateGeneratorFacade drawDateGeneratorFacade;
+    private final IDrawDateGeneratorFacade drawDateGeneratorFacade;
     private final NumberGeneratorFacadeConfigurationProperties properties;
 
     public WinningNumbersDto generateWinningNumbers() {

@@ -2,7 +2,7 @@ package pl.lotto.domain.numbergenerator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import pl.lotto.domain.drawdategenerator.DrawDateGeneratorFacade;
+import pl.lotto.domain.drawdategenerator.IDrawDateGeneratorFacade;
 
 @Configuration
 class NumberGeneratorConfiguration {
@@ -11,7 +11,7 @@ class NumberGeneratorConfiguration {
     NumberGeneratorFacade numberGeneratorFacade(
             IRandomNumberGenerable randomNumberGenerable,
             IWinningNumbersRepository winningNumbersRepository,
-            DrawDateGeneratorFacade drawDateGeneratorFacade,
+            IDrawDateGeneratorFacade drawDateGeneratorFacade,
             NumberGeneratorFacadeConfigurationProperties properties
     ) {
         WinningWinningNumbersValidator winningWinningNumbersValidator = new WinningWinningNumbersValidator();
@@ -27,7 +27,7 @@ class NumberGeneratorConfiguration {
     NumberGeneratorFacade createForTest(
             IRandomNumberGenerable randomNumberGenerable,
             IWinningNumbersRepository winningNumbersRepository,
-            DrawDateGeneratorFacade drawDateGeneratorFacade
+            IDrawDateGeneratorFacade drawDateGeneratorFacade
     ) {
         NumberGeneratorFacadeConfigurationProperties properties = NumberGeneratorFacadeConfigurationProperties.builder()
                 .count(6)
