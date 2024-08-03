@@ -3,6 +3,7 @@ spring:
     allow-bean-definition-overriding: true
   data:
     mongodb:
+      auto-index-creation: true
       uri: ${MONGO_URI}
   mvc:
     pathmatch:
@@ -10,7 +11,7 @@ spring:
 
 lotto:
   number-generator:
-    lotteryRunOccurrencesCron: "0 0 12 * * 6" # every Saturday at 12:00
+    lotteryRunOccurrencesCron: "0 0 11 * * 6" # every Saturday at 11:00
     facade:
       count: 25
       lowerBand: 1
@@ -22,3 +23,5 @@ lotto:
           port: 9090
           connectionTimeout: 5000
           readTimeout: 5000
+  result-checker:
+    resultCheckOccurrencesCron: "0 55 11 * * 6" # every Saturday at 11:55
