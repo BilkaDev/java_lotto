@@ -80,7 +80,17 @@
             <artifactId>wiremock-jre8-standalone</artifactId>
             <version>${wiremock-jre8-standalone.version}</version>
         </dependency>
-
+        <!--        Redis       -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <version>2.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.3.0</version>
+        </dependency>
         <!--        others -->
         <dependency>
             <groupId>org.awaitility</groupId>
@@ -110,6 +120,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

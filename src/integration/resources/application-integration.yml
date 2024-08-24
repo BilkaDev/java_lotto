@@ -3,3 +3,10 @@ lotto:
     lotteryRunOccurrencesCron: "*/5 * * * * *"
   result-checker:
     resultCheckOccurrencesCron: "*/7 * * * * *"
+
+
+spring:
+  cache:
+    type: none
+    redis:
+      time-to-live: PT10S
