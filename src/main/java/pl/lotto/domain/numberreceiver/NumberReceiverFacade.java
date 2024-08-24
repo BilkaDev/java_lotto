@@ -29,8 +29,7 @@ public class NumberReceiverFacade implements INumberReceiverFacade {
 
         String validationResult = numberValidator.validation(numbersFromUser);
         if (!validationResult.isEmpty())
-            return NumberReceiverResponseDto.builder().message(validationResult).build();
-
+            throw new ValidationException(validationResult);
 
         String hash = hashGenerator.getHash();
         LocalDateTime drawDate = drawDateGenerator.retrieveNextDrawDate().drawDate();
