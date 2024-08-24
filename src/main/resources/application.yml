@@ -1,10 +1,17 @@
 spring:
+  cache:
+    type: redis
+    redis:
+      time-to-live: PT60M
   main:
     allow-bean-definition-overriding: true
   data:
     mongodb:
       auto-index-creation: true
       uri: ${MONGO_URI}
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
