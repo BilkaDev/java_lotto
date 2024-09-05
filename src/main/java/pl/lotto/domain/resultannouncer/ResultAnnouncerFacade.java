@@ -2,8 +2,11 @@ package pl.lotto.domain.resultannouncer;
 
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
+import pl.lotto.domain.numberreceiver.dto.TicketDto;
 import pl.lotto.domain.resultannouncer.dto.ResponseDto;
 import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
+import pl.lotto.domain.resultchecker.PlayerResultNotFoundException;
 import pl.lotto.domain.resultchecker.ResultCheckerFacade;
 import pl.lotto.domain.resultchecker.dto.ResultDto;
 
@@ -17,11 +20,14 @@ import static pl.lotto.domain.resultannouncer.MessageResponse.*;
 public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
     private final ResultResponseRepository resultResponseRepository;
     private final ResultCheckerFacade resultCheckerFacade;
+    private final INumberReceiverFacade numberReceiverFacade;
     private final Clock clock;
 
     @Override
     @Cacheable(cacheNames = "results")
     public ResultResponseDto checkResult(String hash) {
+        TicketDto ticketDto = numberReceiverFacade.retrieveTicketByHash(hash);
+
         if (resultResponseRepository.existsById(hash)) {
             Optional<ResultResponse> resultResponseCached = resultResponseRepository.findById(hash);
             if (resultResponseCached.isPresent()) {
@@ -29,11 +35,23 @@ public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
                         .responseDto(ResultMapper.mapToDto(resultResponseCached.get())).build();
             }
         }
-        ResultDto resultDto = resultCheckerFacade.findByTicketId(hash);
-        if (resultDto == null) {
+        ResultDto resultDto;
+        try {
+            resultDto = resultCheckerFacade.findByTicketId(hash);
+        } catch (PlayerResultNotFoundException e) {
             return ResultResponseDto.builder()
-                    .responseDto(null).message(MessageResponse.HASH_DOES_NOT_EXIST_MESSAGE.info).build();
+                    .responseDto(
+                            ResponseDto.builder()
+                                    .hash(hash)
+                                    .numbers(ticketDto.numbersFromUsers())
+                                    .hitNumbers(null)
+                                    .drawDate(ticketDto.drawDate())
+                                    .isWinner(false)
+                                    .wonNumbers(null)
+                                    .build()
+                    ).message(WAIT_MESSAGE.info).build();
         }
+
         ResponseDto responseDto = buildResponseDto(resultDto);
         resultResponseRepository.save(buildResponse(responseDto, LocalDateTime.now(clock)));
         if (resultResponseRepository.existsById(hash) && !isAfterResultAnnouncementTime(resultDto)) {

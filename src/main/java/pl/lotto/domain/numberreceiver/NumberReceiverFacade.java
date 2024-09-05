@@ -69,6 +69,6 @@ public class NumberReceiverFacade implements INumberReceiverFacade {
     public TicketDto retrieveTicketByHash(String hash) {
         return numberReceiverRepository.findByHash(hash)
                 .map(TicketMapper::mapFromTicket)
-                .orElseThrow(() -> new TicketNotFoundException("Ticket not found", hash));
+                .orElseThrow(() -> new TicketNotFoundException("TICKET_NOT_FOUND", hash));
     }
 }

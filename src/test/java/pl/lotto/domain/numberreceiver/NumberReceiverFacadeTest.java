@@ -72,30 +72,35 @@ class NumberReceiverFacadeTest {
     public void should_return_failed_when_user_gave_less_than_six_numbers() {
         // given
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5);
-        // when
-        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
-        // then
-        assertThat(result.message()).isEqualTo(ValidationResult.NOT_SIX_NUMBERS_GIVEN.info);
+
+        // when & then
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            numberReceiverFacade.inputNumbers(numbersFromUser);
+        });
+        assertThat(exception.getMessage()).isEqualTo(ValidationResult.NOT_SIX_NUMBERS_GIVEN.info);
     }
 
     @Test
     public void should_return_failed_when_user_gave_more_than_six_numbers() {
         // given
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6, 7);
-        // when
-        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
-        // then
-        assertThat(result.message()).isEqualTo(ValidationResult.NOT_SIX_NUMBERS_GIVEN.info);
+        // when & then
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            numberReceiverFacade.inputNumbers(numbersFromUser);
+        });
+        assertThat(exception.getMessage()).isEqualTo(ValidationResult.NOT_SIX_NUMBERS_GIVEN.info);
     }
 
     @Test
     public void should_return_failed_when_user_gave_at_least_one_number_out_of_range_of_1_99() {
         // given
         Set<Integer> numbersFromUser = Set.of(100, 2, 3, 4, 5, 6);
-        // when
-        NumberReceiverResponseDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
-        // then
-        assertThat(result.message()).isEqualTo(ValidationResult.NOT_IN_RANGE.info);
+
+        // when & then
+        ValidationException exception = assertThrows(ValidationException.class, () -> {
+            numberReceiverFacade.inputNumbers(numbersFromUser);
+        });
+        assertThat(exception.getMessage()).isEqualTo(ValidationResult.NOT_IN_RANGE.info);
     }
 
     @Test
