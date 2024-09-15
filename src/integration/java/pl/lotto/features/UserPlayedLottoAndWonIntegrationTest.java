@@ -178,6 +178,8 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 () -> assertThat(responseDto.result().isWinner()).isEqualTo(true),
                 () -> assertThat(responseDto.message()).isEqualTo("Congratulations, you won!")
         );
+
+        // step 14: user wants to log off by request GET /logout and system returned ok(200) and clear cookies.
     }
 }
 
