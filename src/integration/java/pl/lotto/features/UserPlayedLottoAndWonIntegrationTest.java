@@ -65,11 +65,26 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                             }
                         }
                 );
-        // step 3: user tried to get user data by querying /api/v1/userData and system returned unauthorized(401)
+        // step 3: user tried to get user data by querying /api/v1/auto-login and system returned unauthorized(401)
+        mockMvc.perform(get("/api/v1/auto-login")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isUnauthorized());
 
 
-        // step 4: user made POST /register with username=someUser, password=somePassword and system registered user with status CREATED(201)
+        // step 4: user made POST /register with login=someUser, password=somePassword, email: some@email.com and system registered user with status CREATED(201)
         // given & when
+        ResultActions registerUser = mockMvc.perform(post("/api/v1/auth/register")
+                .content("""
+                        {
+                            "login": "someUser",
+                            "password": "somePassword",
+                            "email": ": "some@email.com
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        registerUser.andExpect(status().isCreated());
 
         // step 5: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned unauthorized(401)
         // given && when
@@ -84,13 +99,31 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // then
         failedPostInputRequest.andExpect(status().isUnauthorized());
 
-        //step 6: user tried to get user data by requesting POST /login with username=someUser, password=somePassword and system returned OK(200) with user data
+        //step 6: user tried to get user data by requesting POST /login with login=someUser, password=somePassword and system returned OK(200) with user data
         // and cookies with jwt token.
         // given & when
+        ResultActions loginRequest = mockMvc.perform(post("/api/v1/auth/login")
+                .content("""
+                        {
+                            "login": "someUser",
+                            "password": "somePassword"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        //then
+
+        loginRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
 
 
         // step 7: user want to checks if is logged in by GET /logged-in and system returned ok(200) with user data
+        // given & when
+        MvcResult loggedInResponse = mockMvc.perform(get("/api/v1/auth/logged-in")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk()).andReturn();
 
+        // then
+        assertThat(loggedInResponse.getResponse().getContentAsString()).contains("someUser");
 
         // step 8: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
         // with message: "success" and Ticket (DrawDate: 27.07.2024 12:00 Saturday, TicketId: sampleTicketId)
@@ -180,6 +213,11 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         );
 
         // step 14: user wants to log off by request GET /logout and system returned ok(200) and clear cookies.
+        // when
+        ResultActions logoutRequest = mockMvc.perform(get("/api/v1/auth/logout")
+                .contentType(MediaType.APPLICATION_JSON));
+        // then
+        logoutRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
     }
 }
 
