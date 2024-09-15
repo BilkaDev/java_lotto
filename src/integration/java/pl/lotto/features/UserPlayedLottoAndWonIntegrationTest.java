@@ -65,8 +65,34 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                             }
                         }
                 );
+        // step 3: user tried to get user data by querying /api/v1/userData and system returned unauthorized(401)
 
-        // step 3: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
+
+        // step 4: user made POST /register with username=someUser, password=somePassword and system registered user with status CREATED(201)
+        // given & when
+
+        // step 5: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned unauthorized(401)
+        // given && when
+        ResultActions failedPostInputRequest = mockMvc.perform(post("/api/v1/inputNumbers")
+                .content("""
+                        {
+                            "numbers": [1,2,3,4,5,6]
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        failedPostInputRequest.andExpect(status().isUnauthorized());
+
+        //step 6: user tried to get user data by requesting POST /login with username=someUser, password=somePassword and system returned OK(200) with user data
+        // and cookies with jwt token.
+        // given & when
+
+
+        // step 7: user want to checks if is logged in by GET /logged-in and system returned ok(200) with user data
+
+
+        // step 8: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
         // with message: "success" and Ticket (DrawDate: 27.07.2024 12:00 Saturday, TicketId: sampleTicketId)
 
         // Given
@@ -92,7 +118,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         );
 
 
-        // step 4: user made GET /results/notExistingTicketId and system returned not found(404) and with
+        // step 9: user made GET /results/notExistingTicketId and system returned not found(404) and with
         // (message: "Not found for id: notExistingId", and status: "NOT_FOUND")
         // when
         ResultActions getResultNotFoundId = mockMvc.perform(get("/api/v1/results/notExistingId")
@@ -111,12 +137,12 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 );
 
 
-        // step 5: 3 days and 55 minutes passed, and it is 5 minute before draw date: 27.07.2024 11:55 Saturday
+        // step 10: 3 days and 55 minutes passed, and it is 5 minute before draw date: 27.07.2024 11:55 Saturday
         // given
         clock.plusDaysAndMinutes(3, 55);
 
 
-        // step 6: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday,
+        // step 11: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday,
         // and saved it with 6 hits
         await().atMost(20, TimeUnit.SECONDS)
                 .pollInterval(Duration.ofSeconds(1))
@@ -130,12 +156,12 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 });
 
 
-        // step 7: 65 minutes passed, and it is 60 minute after the draw (27.07.2024 13:00 Saturday)
+        // step 12: 65 minutes passed, and it is 60 minute after the draw (27.07.2024 13:00 Saturday)
         // given
         clock.plusMinutes(66);
 
 
-        // step 8: user made GET /results/sampleTicketId and system returned ok(200)
+        // step 13: user made GET /results/sampleTicketId and system returned ok(200)
         // when
         ResultActions successResultPerform = mockMvc.perform(get("/api/v1/results/" + ticketId)
                 .contentType(MediaType.APPLICATION_JSON)
