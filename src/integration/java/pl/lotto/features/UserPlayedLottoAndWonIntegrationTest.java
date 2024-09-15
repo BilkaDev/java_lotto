@@ -66,7 +66,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                         }
                 );
         // step 3: user tried to get user data by querying /api/v1/auto-login and system returned unauthorized(401)
-        mockMvc.perform(get("/api/v1/auto-login")
+        mockMvc.perform(get("/api/v1/auth/auto-login")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isUnauthorized());
 
