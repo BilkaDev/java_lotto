@@ -103,9 +103,9 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .andExpect(content()
                         .json("""
                                 {
-                                    "messages":["Not found for id: notExistingId"],
+                                    "messages":["Ticket with hash notExistingId not found"],
                                     "status":"NOT_FOUND",
-                                    "code":"PLAYER_RESULT_NOT_FOUND"
+                                    "code":"TICKET_NOT_FOUND"
                                 }
                                 """.trim())
                 );
