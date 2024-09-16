@@ -1,6 +1,7 @@
 package pl.lotto.domain.loginandregister;
 
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
 import pl.lotto.domain.loginandregister.dto.RegistrationResultDto;
@@ -12,7 +13,7 @@ public class LoginAndRegisterFacade implements ILoginAndRegisterFacade {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto findByLogin(String login) {
+    public UserDto findByLogin(String login) throws UsernameNotFoundException {
         return userRepository.findByLogin(login)
                 .map(user -> UserDto.builder()
                         .id(user.getId())
@@ -20,7 +21,7 @@ public class LoginAndRegisterFacade implements ILoginAndRegisterFacade {
                         .email(user.getEmail())
                         .password(user.getPassword())
                         .build())
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override

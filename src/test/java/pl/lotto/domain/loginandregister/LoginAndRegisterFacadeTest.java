@@ -2,6 +2,7 @@ package pl.lotto.domain.loginandregister;
 
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
 import pl.lotto.domain.loginandregister.dto.RegistrationResultDto;
 import pl.lotto.domain.loginandregister.dto.UserDto;
@@ -65,7 +66,7 @@ public class LoginAndRegisterFacadeTest {
         Throwable thrown = catchThrowable(() -> loginAndRegisterFacade.findByLogin(login));
         // then
         AssertionsForClassTypes.assertThat(thrown)
-                .isInstanceOf(UserNotFoundException.class)
+                .isInstanceOf(UsernameNotFoundException.class)
                 .hasMessage("User not found");
     }
 }

@@ -1,17 +1,18 @@
 package pl.lotto.infrastructure.auth;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @AllArgsConstructor
 @Log4j2
 public class AuthController {
+    private final JwtAuthenticatorFacade jwtAuthenticatorFacade;
 
     @GetMapping("/auto-login")
     public ResponseEntity<?> autoLogin() {
@@ -31,13 +32,16 @@ public class AuthController {
         return null;
     }
 
-    @GetMapping("/login")
-    public ResponseEntity<?> login() {
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+            @Valid @RequestBody LoginRequestDto loginRequest
+    ) {
         log.info("--TRY LOGIN USER");
+        jwtAuthenticatorFacade.authenticate(loginRequest);
         return null;
     }
 
-    @GetMapping("/register")
+    @PostMapping("/register")
     public ResponseEntity<?> register() {
         log.info("--TRY REGISTER USER");
         return null;

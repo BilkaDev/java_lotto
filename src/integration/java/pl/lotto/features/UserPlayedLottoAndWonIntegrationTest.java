@@ -65,7 +65,31 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                             }
                         }
                 );
-        // step 3: user tried to get user data by querying /api/v1/auto-login and system returned unauthorized(401)
+        //step 3: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned UNAUTHORIZED(401)
+        // given & when
+        ResultActions failedLoginRequest = mockMvc.perform(post("/api/v1/auth/login")
+                .content("""
+                        {
+                        "login": "someUser",
+                        "password": "somePassword"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        // then
+        failedLoginRequest
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().json("""
+                        {
+                            "messages":["The specified user with the given name does not exist"],
+                            "status":"UNAUTHORIZED",
+                            "code":"A1"
+                        }
+                        """.trim()));
+
+
+        // step 3.1: user tried to get user data by querying /api/v1/auto-login and system returned unauthorized(401)
         mockMvc.perform(get("/api/v1/auth/auto-login")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isUnauthorized());

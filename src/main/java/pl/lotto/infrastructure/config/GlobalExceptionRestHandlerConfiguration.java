@@ -2,10 +2,12 @@ package pl.lotto.infrastructure.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lotto.domain.common.BaseException;
+import pl.lotto.domain.common.Code;
 import pl.lotto.domain.common.HttpStatus;
 
 import java.util.ArrayList;
@@ -27,6 +29,17 @@ public class GlobalExceptionRestHandlerConfiguration {
                 .status(statusCode)
                 .build();
         return ResponseEntity.status(statusCode.getValue()).body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiErrorDto> handleBadCredentialsException(BadCredentialsException ex) {
+        log.error("Bad credentials exception occurred: {}", ex.getMessage());
+        ApiErrorDto response = ApiErrorDto.builder()
+                .code(Code.A1.toString())
+                .messages(List.of(Code.A1.getLabel()))
+                .status(HttpStatus.UNAUTHORIZED)
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.getValue()).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
