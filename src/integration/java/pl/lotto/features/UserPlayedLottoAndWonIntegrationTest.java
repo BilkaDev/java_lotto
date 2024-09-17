@@ -95,22 +95,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized());
 
 
-        // step 4: user made POST /register with login=someUser, password=somePassword, email: some@email.com and system registered user with status CREATED(201)
-        // given & when
-        ResultActions registerUser = mockMvc.perform(post("/api/v1/auth/register")
-                .content("""
-                        {
-                            "login": "someUser",
-                            "password": "somePassword",
-                            "email": ": "some@email.com
-                        }
-                        """.trim())
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
-
-        // then
-        registerUser.andExpect(status().isCreated());
-
-        // step 5: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned unauthorized(401)
+        // step 4: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned unauthorized(401)
         // given && when
         ResultActions failedPostInputRequest = mockMvc.perform(post("/api/v1/inputNumbers")
                 .content("""
@@ -122,6 +107,23 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
         // then
         failedPostInputRequest.andExpect(status().isUnauthorized());
+
+
+        // step 5: user made POST /register with login=someUser, password=somePassword, email: some@email.com and system registered user with status CREATED(201)
+        // given & when
+        ResultActions registerUser = mockMvc.perform(post("/api/v1/auth/register")
+                .content("""
+                                        {
+                                            "login": "someUser",
+                                            "password": "somePassword",
+                                            "email": ": "some@email.com
+                                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        registerUser.andExpect(status().isCreated());
+
 
         //step 6: user tried to get user data by requesting POST /login with login=someUser, password=somePassword and system returned OK(200) with user data
         // and cookies with jwt token.
