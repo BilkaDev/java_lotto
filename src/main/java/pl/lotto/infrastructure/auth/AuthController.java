@@ -17,7 +17,6 @@ import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
 @AllArgsConstructor
 @Log4j2
 public class AuthController {
-    private final JwtAuthenticatorFacade jwtAuthenticatorFacade;
     private final UserService userService;
 
     @GetMapping("/auto-login")
