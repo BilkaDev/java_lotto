@@ -10,7 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import pl.lotto.domain.common.Code;
-import pl.lotto.infrastructure.auth.LoginRequestDto;
+import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
 
 @AllArgsConstructor
 @Component

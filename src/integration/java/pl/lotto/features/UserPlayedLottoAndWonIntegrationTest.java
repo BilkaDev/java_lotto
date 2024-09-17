@@ -113,12 +113,12 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // given & when
         ResultActions registerUser = mockMvc.perform(post("/api/v1/auth/register")
                 .content("""
-                                        {
-                                            "login": "someUser",
-                                            "password": "somePassword",
-                                            "email": ": "some@email.com
-                                        }
-                        """.trim())
+                {
+                    "login": "someUser",
+                    "password": "somePassword",
+                    "email": "some@email.com"
+                }
+                """.trim())
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         // then

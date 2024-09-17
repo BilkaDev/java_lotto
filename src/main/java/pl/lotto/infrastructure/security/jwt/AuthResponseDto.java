@@ -4,7 +4,6 @@ import lombok.Getter;
 import pl.lotto.domain.common.Code;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 
 @Getter

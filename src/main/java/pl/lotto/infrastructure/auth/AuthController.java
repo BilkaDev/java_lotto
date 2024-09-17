@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
+import pl.lotto.infrastructure.auth.dto.RegisterRequestDto;
+import pl.lotto.infrastructure.auth.services.UserService;
 import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
 
 @RestController
@@ -15,13 +18,13 @@ import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
 @Log4j2
 public class AuthController {
     private final JwtAuthenticatorFacade jwtAuthenticatorFacade;
+    private final UserService userService;
 
     @GetMapping("/auto-login")
     public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
         log.info("--TRY AUTO LOGIN USER");
-        return jwtAuthenticatorFacade.loginByToken(request, response);
+        return this.userService.autoLogin(request, response);
     }
-
 
 
     @GetMapping("/logged-in")
@@ -41,13 +44,15 @@ public class AuthController {
             @Valid @RequestBody LoginRequestDto loginRequest
     ) {
         log.info("--TRY LOGIN USER");
-        jwtAuthenticatorFacade.authenticate(loginRequest);
+        this.userService.login(loginRequest);
         return null;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register() {
-        log.info("--TRY REGISTER USER");
-        return null;
+    public ResponseEntity<ResponseDto> register(@Valid @RequestBody RegisterRequestDto registerUserDto) {
+        log.info("--START REGISTER USER");
+        ResponseEntity<ResponseDto> register = this.userService.register(registerUserDto);
+        log.info("--END REGISTER USER");
+        return register;
     }
 }

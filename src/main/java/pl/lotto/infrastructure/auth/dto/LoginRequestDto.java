@@ -1,4 +1,4 @@
-package pl.lotto.infrastructure.auth;
+package pl.lotto.infrastructure.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
