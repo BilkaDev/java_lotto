@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.lotto.domain.resultannouncer.IResultAnnouncerFacade;
-import pl.lotto.domain.resultannouncer.dto.ResponseDto;
+import pl.lotto.domain.resultannouncer.dto.ResultDto;
 import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
 
 @RestController
@@ -24,29 +24,29 @@ public class ResultAnnouncerRestController {
     ) {
         log.info("Start announcing results");
         ResultResponseDto resultResponseDto = resultAnnouncerFacade.checkResult(ticketId);
-        ResponseDto responseDto = resultResponseDto.responseDto();
+        ResultDto resultDto = resultResponseDto.resultDto();
 
-        CheckResultResponseDto responseBody = buildResponse(responseDto, resultResponseDto);
+        CheckResultResponseDto responseBody = buildResponse(resultDto, resultResponseDto);
         log.info("Stop announcing results");
         return ResponseEntity.ok(responseBody);
     }
 
-    private static CheckResultResponseDto buildResponse(ResponseDto responseDto, ResultResponseDto resultResponseDto) {
+    private static CheckResultResponseDto buildResponse(ResultDto resultDto, ResultResponseDto resultResponseDto) {
         return CheckResultResponseDto.builder()
-                .result(buildResult(responseDto))
+                .result(buildResult(resultDto))
                 .message(resultResponseDto.message())
                 .build();
     }
 
-    private static CheckResultDto buildResult(ResponseDto responseDto) {
+    private static CheckResultDto buildResult(ResultDto resultDto) {
         return CheckResultDto
                 .builder()
-                .hitNumbers(responseDto.hitNumbers())
-                .hash(responseDto.hash())
-                .drawDate(responseDto.drawDate())
-                .isWinner(responseDto.isWinner())
-                .numbers(responseDto.numbers())
-                .wonNumbers(responseDto.wonNumbers())
+                .hitNumbers(resultDto.hitNumbers())
+                .hash(resultDto.hash())
+                .drawDate(resultDto.drawDate())
+                .isWinner(resultDto.isWinner())
+                .numbers(resultDto.numbers())
+                .wonNumbers(resultDto.wonNumbers())
                 .build();
     }
 }
