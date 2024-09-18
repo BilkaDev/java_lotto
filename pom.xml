@@ -22,6 +22,7 @@
         <wiremock-jre8-standalone.version>2.35.1</wiremock-jre8-standalone.version>
         <awaitility.version>4.2.0</awaitility.version>
         <spring-security.version>6.3.3</spring-security.version>
+        <java-jwt.version>4.3.0</java-jwt.version>
     </properties>
 
     <dependencies>
@@ -114,6 +115,12 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>${java-jwt.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

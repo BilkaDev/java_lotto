@@ -10,7 +10,7 @@ import pl.lotto.domain.loginandregister.dto.UserDto;
 import java.util.Collections;
 
 @AllArgsConstructor
-public class LoginUserDetailsService implements UserDetailsService {
+class LoginUserDetailsService implements UserDetailsService {
     private final LoginAndRegisterFacade loginAndRegisterFacade;
 
     @Override
@@ -19,10 +19,12 @@ public class LoginUserDetailsService implements UserDetailsService {
         return this.getUser(userDto);
     }
 
-    private org.springframework.security.core.userdetails.User getUser(UserDto user) {
-        return new org.springframework.security.core.userdetails.User(
+    private CustomUserDetails getUser(UserDto user) {
+        return new CustomUserDetails(
                 user.login(),
                 user.password(),
-                Collections.emptyList());
+                Collections.emptyList(),
+                user.email()
+        );
     }
 }

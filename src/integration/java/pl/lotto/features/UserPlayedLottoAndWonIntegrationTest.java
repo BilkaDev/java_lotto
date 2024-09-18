@@ -1,6 +1,7 @@
 package pl.lotto.features;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,9 @@ import pl.lotto.infrastructure.resultannoucer.controller.CheckResultResponseDto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -113,12 +116,12 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // given & when
         ResultActions registerUser = mockMvc.perform(post("/api/v1/auth/register")
                 .content("""
-                {
-                    "login": "someUser",
-                    "password": "somePassword",
-                    "email": "some@email.com"
-                }
-                """.trim())
+                        {
+                            "login": "someUser",
+                            "password": "somePassword",
+                            "email": "some@email.com"
+                        }
+                        """.trim())
                 .contentType(MediaType.APPLICATION_JSON_VALUE));
 
         // then
@@ -128,19 +131,32 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         //step 6: user tried to get user data by requesting POST /login with login=someUser, password=somePassword and system returned OK(200) with user data
         // and cookies with jwt token.
         // given & when
-        ResultActions loginRequest = mockMvc.perform(post("/api/v1/auth/login")
+        ResultActions successLoginRequest = mockMvc.perform(post("/api/v1/auth/login")
                 .content("""
                         {
-                            "login": "someUser",
-                            "password": "somePassword"
+                        "login": "someUser",
+                        "password": "somePassword"
                         }
                         """.trim())
-                .contentType(MediaType.APPLICATION_JSON_VALUE));
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
 
         //then
 
-        loginRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
+        MvcResult mvcResultLogin = successLoginRequest.andExpect(status().isOk()).andReturn();
+        Cookie[] cookies = mvcResultLogin.getResponse().getCookies();
+        assertThat(cookies).isNotEmpty();
+        Cookie authorizationCookie = Arrays.stream(cookies)
+                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
+        assertThat(authorizationCookie).isNotNull();
+        String jwtRegex = "^[A-Za-z0-9-_=]+\\.([A-Za-z0-9-_=]+)\\.([A-Za-z0-9-_.+/=]*)$";
+        Pattern pattern = Pattern.compile(jwtRegex);
 
+        assertThat(pattern.matcher(authorizationCookie.getValue()).matches())
+                .as("Authorization cookie should contain a valid JWT token")
+                .isTrue();
 
         // step 7: user want to checks if is logged in by GET /logged-in and system returned ok(200) with user data
         // given & when
@@ -149,7 +165,9 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isOk()).andReturn();
 
         // then
-        assertThat(loggedInResponse.getResponse().getContentAsString()).contains("someUser");
+        assertThat(loggedInResponse.getResponse().
+                getContentAsString()).
+                contains("someUser");
 
         // step 8: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
         // with message: "success" and Ticket (DrawDate: 27.07.2024 12:00 Saturday, TicketId: sampleTicketId)
@@ -169,11 +187,34 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         String json = mvcResult.getResponse().getContentAsString();
         InputNumbersResponseDto inputNumbersResponseDto = objectMapper.readValue(json, InputNumbersResponseDto.class);
         String ticketId = inputNumbersResponseDto.ticket().ticketId();
+
         assertAll(
-                () -> assertThat(inputNumbersResponseDto.ticket().numbers()).contains(1, 2, 3, 4, 5, 6),
-                () -> assertThat(inputNumbersResponseDto.ticket().drawDate()).isEqualTo(drawDate),
-                () -> assertThat(inputNumbersResponseDto.ticket().ticketId()).isNotEmpty(),
-                () -> assertThat(inputNumbersResponseDto.message()).isEqualTo("SUCCESS")
+                () ->
+
+                        assertThat(inputNumbersResponseDto.ticket().
+
+                                numbers()).
+
+                                contains(1, 2, 3, 4, 5, 6),
+                () ->
+
+                        assertThat(inputNumbersResponseDto.ticket().
+
+                                drawDate()).
+
+                                isEqualTo(drawDate),
+                () ->
+
+                        assertThat(inputNumbersResponseDto.ticket().
+
+                                ticketId()).
+
+                                isNotEmpty(),
+                () ->
+
+                        assertThat(inputNumbersResponseDto.message()).
+
+                                isEqualTo("SUCCESS")
         );
 
 
@@ -184,9 +225,17 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON));
         // then
         getResultNotFoundId
-                .andExpect(status().isNotFound())
-                .andExpect(content()
-                        .json("""
+                .andExpect(
+
+                        status().
+
+                                isNotFound())
+                        .
+
+                andExpect(content()
+                        .
+
+                        json("""
                                 {
                                     "messages":["Ticket with hash notExistingId not found"],
                                     "status":"NOT_FOUND",
@@ -203,9 +252,17 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
         // step 11: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday,
         // and saved it with 6 hits
-        await().atMost(20, TimeUnit.SECONDS)
-                .pollInterval(Duration.ofSeconds(1))
-                .until(() -> {
+        await().
+
+                atMost(20, TimeUnit.SECONDS)
+                        .
+
+                pollInterval(Duration.ofSeconds(1))
+                        .
+
+                until(() ->
+
+                {
                     try {
                         ResultDto byTicketId = resultCheckerFacade.findByTicketId(ticketId);
                         return !byTicketId.numbers().isEmpty();
@@ -229,13 +286,48 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         MvcResult mvcResultGetResults = successResultPerform.andExpect(status().isOk()).andReturn();
         String jsonGetResults = mvcResultGetResults.getResponse().getContentAsString();
         CheckResultResponseDto responseDto = objectMapper.readValue(jsonGetResults, CheckResultResponseDto.class);
+
         assertAll(
-                () -> assertThat(responseDto.result().numbers()).contains(1, 2, 3, 4, 5, 6),
-                () -> assertThat(responseDto.result().drawDate()).isEqualTo(drawDate),
-                () -> assertThat(responseDto.result().hash()).isEqualTo(ticketId),
-                () -> assertThat(responseDto.result().hitNumbers()).hasSize(6),
-                () -> assertThat(responseDto.result().isWinner()).isEqualTo(true),
-                () -> assertThat(responseDto.message()).isEqualTo("Congratulations, you won!")
+                () ->
+
+                        assertThat(responseDto.result().
+
+                                numbers()).
+
+                                contains(1, 2, 3, 4, 5, 6),
+                () ->
+
+                        assertThat(responseDto.result().
+
+                                drawDate()).
+
+                                isEqualTo(drawDate),
+                () ->
+
+                        assertThat(responseDto.result().
+
+                                hash()).
+
+                                isEqualTo(ticketId),
+                () ->
+
+                        assertThat(responseDto.result().
+
+                                hitNumbers()).
+
+                                hasSize(6),
+                () ->
+
+                        assertThat(responseDto.result().
+
+                                isWinner()).
+
+                                isEqualTo(true),
+                () ->
+
+                        assertThat(responseDto.message()).
+
+                                isEqualTo("Congratulations, you won!")
         );
 
         // step 14: user wants to log off by request GET /logout and system returned ok(200) and clear cookies.
@@ -243,7 +335,17 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         ResultActions logoutRequest = mockMvc.perform(get("/api/v1/auth/logout")
                 .contentType(MediaType.APPLICATION_JSON));
         // then
-        logoutRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
+        logoutRequest.andExpect(
+
+                        status().
+
+                                isOk()).
+
+                andReturn().
+
+                getResponse().
+
+                getCookies();
     }
 }
 

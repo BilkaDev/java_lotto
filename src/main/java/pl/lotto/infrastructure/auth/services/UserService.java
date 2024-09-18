@@ -1,5 +1,6 @@
 package pl.lotto.infrastructure.auth.services;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -11,8 +12,10 @@ import pl.lotto.domain.loginandregister.LoginAndRegisterFacade;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
 import pl.lotto.infrastructure.auth.ResponseDto;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
+import pl.lotto.infrastructure.auth.dto.LoginResponseDto;
 import pl.lotto.infrastructure.auth.dto.RegisterRequestDto;
 import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
+import pl.lotto.infrastructure.security.jwt.dto.JwtResponseDto;
 
 @Service
 @AllArgsConstructor
@@ -20,9 +23,18 @@ public class UserService {
     private final LoginAndRegisterFacade loginAndRegisterFacade;
     private final PasswordEncoder bcryptEncoder;
     private final JwtAuthenticatorFacade jwtAuthenticatorFacade;
+    private final CookieService cookieService;
 
-    public void login(LoginRequestDto loginRequestDto) {
-        jwtAuthenticatorFacade.authenticate(loginRequestDto);
+    public ResponseEntity<LoginResponseDto> login(LoginRequestDto loginRequestDto, HttpServletResponse response) {
+        JwtResponseDto jwtResponseDto = jwtAuthenticatorFacade.authenticate(loginRequestDto);
+        Cookie cookie = cookieService.generateCookie("Authorization", jwtResponseDto.token(), jwtResponseDto.tokenExp().intValue() * 24 * 60 * 60);
+
+        response.addCookie(cookie);
+        return ResponseEntity.ok(LoginResponseDto.builder()
+                .email(jwtResponseDto.email())
+                .login(jwtResponseDto.login())
+                .build()
+        );
     }
 
     public ResponseEntity<ResponseDto> register(RegisterRequestDto registerUserDto) {

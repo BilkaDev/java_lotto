@@ -40,11 +40,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(
-            @Valid @RequestBody LoginRequestDto loginRequest
+            @Valid @RequestBody LoginRequestDto loginRequest,
+            HttpServletResponse response
     ) {
         log.info("--TRY LOGIN USER");
-        this.userService.login(loginRequest);
-        return null;
+        return this.userService.login(loginRequest, response);
     }
 
     @PostMapping("/register")

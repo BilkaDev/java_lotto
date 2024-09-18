@@ -17,7 +17,7 @@ import pl.lotto.domain.loginandregister.LoginAndRegisterFacade;
 
 @Configuration
 @AllArgsConstructor
-public class SecurityConfig {
+class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

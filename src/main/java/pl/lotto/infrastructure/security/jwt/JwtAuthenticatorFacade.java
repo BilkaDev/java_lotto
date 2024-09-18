@@ -11,22 +11,32 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import pl.lotto.domain.common.Code;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
+import pl.lotto.infrastructure.security.jwt.dto.JwtResponseDto;
+import pl.lotto.infrastructure.security.jwt.dto.ResponseDto;
 
 @AllArgsConstructor
 @Component
 public class JwtAuthenticatorFacade {
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public ResponseEntity<?> authenticate(LoginRequestDto loginRequest) {
+    public JwtResponseDto authenticate(LoginRequestDto loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.login(), loginRequest.password())
         );
-        return null;
+        CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
+        String token = jwtService.createToken(user);
+        return JwtResponseDto.builder()
+                .token(token)
+                .email(user.getEmail())
+                .login(user.getUsername())
+                .tokenExp(jwtService.getExpiration())
+                .build();
     }
-
 
     public ResponseEntity<?> loginByToken(HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponseDto(Code.A3));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDto(Code.A3));
     }
+
 
 }
