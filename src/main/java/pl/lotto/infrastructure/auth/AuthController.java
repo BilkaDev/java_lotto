@@ -21,7 +21,7 @@ public class AuthController {
     private final UserService userService;
 
     @GetMapping("/auto-login")
-    public ResponseEntity<LoginResponseDto> autoLogin(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<LoginResponseDto> autoLogin(HttpServletRequest request) {
         log.info("--TRY AUTO LOGIN USER");
         return this.userService.autoLogin(request);
     }
