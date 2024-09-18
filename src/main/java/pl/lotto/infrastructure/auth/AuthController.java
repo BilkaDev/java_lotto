@@ -7,10 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.lotto.infrastructure.auth.dto.AuthResponseDto;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
+import pl.lotto.infrastructure.auth.dto.LoginResponseDto;
 import pl.lotto.infrastructure.auth.dto.RegisterRequestDto;
 import pl.lotto.infrastructure.auth.services.UserService;
-import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -20,16 +21,16 @@ public class AuthController {
     private final UserService userService;
 
     @GetMapping("/auto-login")
-    public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<LoginResponseDto> autoLogin(HttpServletRequest request, HttpServletResponse response) {
         log.info("--TRY AUTO LOGIN USER");
-        return this.userService.autoLogin(request, response);
+        return this.userService.autoLogin(request);
     }
 
 
     @GetMapping("/logged-in")
-    public ResponseEntity<?> loggedIn() {
+    public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request, HttpServletResponse response) {
         log.info("--TRY LOGGED IN USER");
-        return null;
+        return userService.loggedIn(request, response);
     }
 
     @GetMapping("/logout")
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
+    public ResponseEntity<LoginResponseDto> login(
             @Valid @RequestBody LoginRequestDto loginRequest,
             HttpServletResponse response
     ) {

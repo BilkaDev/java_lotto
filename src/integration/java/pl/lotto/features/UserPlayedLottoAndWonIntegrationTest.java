@@ -158,6 +158,17 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .as("Authorization cookie should contain a valid JWT token")
                 .isTrue();
 
+
+        // step 6.1: user tried to get user data by querying /api/v1/auto-login and system returned ok(200) with user data
+        // given & when
+        MvcResult autoLoginResponse = mockMvc.perform(get("/api/v1/auth/auto-login")
+                        .cookie(authorizationCookie)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk()).andReturn();
+        // then
+        assertThat(autoLoginResponse.getResponse().getContentAsString()).contains("someUser");
+
+
         // step 7: user want to checks if is logged in by GET /logged-in and system returned ok(200) with user data
         // given & when
         MvcResult loggedInResponse = mockMvc.perform(get("/api/v1/auth/logged-in")

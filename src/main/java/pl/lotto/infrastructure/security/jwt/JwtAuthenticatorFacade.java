@@ -1,24 +1,27 @@
 package pl.lotto.infrastructure.security.jwt;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import pl.lotto.domain.common.Code;
+import pl.lotto.domain.loginandregister.ILoginAndRegisterFacade;
+import pl.lotto.domain.loginandregister.dto.UserDto;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
 import pl.lotto.infrastructure.security.jwt.dto.JwtResponseDto;
-import pl.lotto.infrastructure.security.jwt.dto.ResponseDto;
 
 @AllArgsConstructor
 @Component
+@Log4j2
 public class JwtAuthenticatorFacade {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final ILoginAndRegisterFacade loginAndRegisterFacade;
 
     public JwtResponseDto authenticate(LoginRequestDto loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -34,8 +37,25 @@ public class JwtAuthenticatorFacade {
                 .build();
     }
 
-    public ResponseEntity<?> loginByToken(HttpServletRequest request, HttpServletResponse response) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseDto(Code.A3));
+    public JwtResponseDto loginByToken(String token) {
+        try {
+            DecodedJWT decodedJWT = jwtService.validateToken(token);
+            String login = decodedJWT.getSubject();
+            UserDto userDto = loginAndRegisterFacade.findByLogin(login);
+            return JwtResponseDto.builder()
+                    .token(decodedJWT.getToken())
+                    .email(userDto.email())
+                    .tokenExp((long) decodedJWT.getExpiresAt().getDay())
+                    .login(userDto.login())
+                    .build();
+        } catch (
+                JWTVerificationException | IllegalArgumentException e) {
+            throw new TokenExpiredException();
+        }
+    }
+
+    public boolean loggedIn(HttpServletRequest request, HttpServletResponse response) {
+        return false;
     }
 
 

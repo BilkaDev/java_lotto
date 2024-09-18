@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,14 +12,19 @@ import org.springframework.stereotype.Service;
 import pl.lotto.domain.loginandregister.LoginAndRegisterFacade;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
 import pl.lotto.infrastructure.auth.ResponseDto;
+import pl.lotto.infrastructure.auth.dto.AuthResponseDto;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
 import pl.lotto.infrastructure.auth.dto.LoginResponseDto;
 import pl.lotto.infrastructure.auth.dto.RegisterRequestDto;
 import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
+import pl.lotto.infrastructure.security.jwt.TokenExpiredException;
 import pl.lotto.infrastructure.security.jwt.dto.JwtResponseDto;
+
+import java.util.Arrays;
 
 @Service
 @AllArgsConstructor
+@Log4j2
 public class UserService {
     private final LoginAndRegisterFacade loginAndRegisterFacade;
     private final PasswordEncoder bcryptEncoder;
@@ -54,7 +60,31 @@ public class UserService {
                 );
     }
 
-    public ResponseEntity<?> autoLogin(HttpServletRequest request, HttpServletResponse response) {
-        return jwtAuthenticatorFacade.loginByToken(request, response);
+    public ResponseEntity<LoginResponseDto> autoLogin(HttpServletRequest request) {
+        String token = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie value : Arrays.stream(cookies).toList()) {
+                if (value.getName().equals("Authorization")) {
+                    token = value.getValue();
+                }
+            }
+        } else {
+            log.info("Can't login because token is empty");
+            throw new TokenExpiredException();
+        }
+        JwtResponseDto jwtResponseDto = jwtAuthenticatorFacade.loginByToken(token);
+        return ResponseEntity.ok(LoginResponseDto.builder()
+                .email(jwtResponseDto.email())
+                .login(jwtResponseDto.login())
+                .build());
+    }
+
+    public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request, HttpServletResponse response) {
+
+        return ResponseEntity.ok(AuthResponseDto.builder()
+                .code("PERMIT | DENIED")
+                .message("User logged in successfully")
+                .build());
     }
 }
