@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Builder
-public record ResponseDto(
+public record ResultDto(
         String hash,
         Set<Integer> numbers,
         Set<Integer> wonNumbers,

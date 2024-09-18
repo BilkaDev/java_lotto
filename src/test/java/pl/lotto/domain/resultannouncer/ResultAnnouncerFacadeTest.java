@@ -5,11 +5,10 @@ import org.junit.jupiter.api.Test;
 import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
 import pl.lotto.domain.numberreceiver.TicketNotFoundException;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
-import pl.lotto.domain.resultannouncer.dto.ResponseDto;
+import pl.lotto.domain.resultannouncer.dto.ResultDto;
 import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
 import pl.lotto.domain.resultchecker.PlayerResultNotFoundException;
 import pl.lotto.domain.resultchecker.ResultCheckerFacade;
-import pl.lotto.domain.resultchecker.dto.ResultDto;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -34,7 +33,7 @@ class ResultAnnouncerFacadeTest {
         LocalDateTime drawDate = LocalDateTime.of(2024, 7, 27, 12, 0, 0);
         String hash = "123";
         IResultAnnouncerFacade resultAnnouncerFacade = new ResultAnnouncerConfiguration().createForTest(resultResponseRepository, resultCheckerFacade, numberReceiverFacade, Clock.systemUTC());
-        ResultDto resultDto = ResultDto.builder()
+        pl.lotto.domain.resultchecker.dto.ResultDto resultDto = pl.lotto.domain.resultchecker.dto.ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of())
@@ -45,7 +44,7 @@ class ResultAnnouncerFacadeTest {
         //when
         ResultResponseDto resultResponseDto = resultAnnouncerFacade.checkResult(hash);
         //then
-        ResponseDto responseDto = ResponseDto.builder()
+        ResultDto responseDto = ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of())
@@ -63,7 +62,7 @@ class ResultAnnouncerFacadeTest {
         LocalDateTime drawDate = LocalDateTime.of(2024, 7, 27, 12, 0, 0);
         String hash = "123";
         IResultAnnouncerFacade resultAnnouncerFacade = new ResultAnnouncerConfiguration().createForTest(resultResponseRepository, resultCheckerFacade, numberReceiverFacade, Clock.systemUTC());
-        ResultDto resultDto = ResultDto.builder()
+        pl.lotto.domain.resultchecker.dto.ResultDto resultDto = pl.lotto.domain.resultchecker.dto.ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of(1, 2, 3, 4, 9, 0))
@@ -74,7 +73,7 @@ class ResultAnnouncerFacadeTest {
         //when
         ResultResponseDto resultResponseDto = resultAnnouncerFacade.checkResult(hash);
         //then
-        ResponseDto responseDto = ResponseDto.builder()
+        ResultDto responseDto = ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of(1, 2, 3, 4, 9, 0))
@@ -93,7 +92,7 @@ class ResultAnnouncerFacadeTest {
         String hash = "123";
         Clock clock = Clock.fixed(LocalDateTime.of(2024, 7, 23, 12, 0, 0).toInstant(ZoneOffset.UTC), ZoneId.systemDefault());
         IResultAnnouncerFacade resultAnnouncerFacade = new ResultAnnouncerConfiguration().createForTest(resultResponseRepository, resultCheckerFacade, numberReceiverFacade, clock);
-        ResultDto resultDto = ResultDto.builder()
+        pl.lotto.domain.resultchecker.dto.ResultDto resultDto = pl.lotto.domain.resultchecker.dto.ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of(1, 2, 3, 4, 9, 0))
@@ -104,7 +103,7 @@ class ResultAnnouncerFacadeTest {
         //when
         ResultResponseDto resultResponseDto = resultAnnouncerFacade.checkResult(hash);
         //then
-        ResponseDto responseDto = ResponseDto.builder()
+        ResultDto responseDto = ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of(1, 2, 3, 4, 9, 0))
@@ -130,7 +129,7 @@ class ResultAnnouncerFacadeTest {
         ResultResponseDto resultResponseDto = resultAnnouncerFacade.checkResult(hash);
         //then
         ResultResponseDto expectedResult = new ResultResponseDto(
-                ResponseDto.builder()
+                ResultDto.builder()
                         .hash("123")
                         .numbers(Set.of(1))
                         .hitNumbers(null)
@@ -163,7 +162,7 @@ class ResultAnnouncerFacadeTest {
         //given
         LocalDateTime drawDate = LocalDateTime.of(2024, 7, 27, 12, 0, 0);
         String hash = "123";
-        ResultDto resultDto = ResultDto.builder()
+        pl.lotto.domain.resultchecker.dto.ResultDto resultDto = pl.lotto.domain.resultchecker.dto.ResultDto.builder()
                 .hash("123")
                 .numbers(Set.of(1, 2, 3, 4, 5, 6))
                 .hitNumbers(Set.of(1, 2, 3, 4, 9, 0))
@@ -174,12 +173,12 @@ class ResultAnnouncerFacadeTest {
 
         IResultAnnouncerFacade resultAnnouncerFacade = new ResultAnnouncerConfiguration().createForTest(resultResponseRepository, resultCheckerFacade, numberReceiverFacade, Clock.systemUTC());
         ResultResponseDto resultResponseDto1 = resultAnnouncerFacade.checkResult(hash);
-        String underTest = resultResponseDto1.responseDto().hash();
+        String underTest = resultResponseDto1.resultDto().hash();
         //when
         ResultResponseDto resultResponseDto = resultAnnouncerFacade.checkResult(underTest);
         //then
         ResultResponseDto expectedResult = new ResultResponseDto(
-                resultResponseDto.responseDto()
+                resultResponseDto.resultDto()
                 , ALREADY_CHECKED.info);
         assertThat(resultResponseDto).isEqualTo(expectedResult);
     }
