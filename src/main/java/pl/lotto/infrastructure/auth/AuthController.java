@@ -28,9 +28,9 @@ public class AuthController {
 
 
     @GetMapping("/logged-in")
-    public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request) {
         log.info("--TRY LOGGED IN USER");
-        return userService.loggedIn(request, response);
+        return userService.loggedIn(request);
     }
 
     @GetMapping("/logout")

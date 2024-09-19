@@ -2,8 +2,6 @@ package pl.lotto.infrastructure.security.jwt;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,9 +52,12 @@ public class JwtAuthenticatorFacade {
         }
     }
 
-    public boolean loggedIn(HttpServletRequest request, HttpServletResponse response) {
-        return false;
+    public boolean loggedIn(String token) {
+        try {
+            jwtService.validateToken(token);
+            return true;
+        } catch (TokenExpiredException e) {
+            return false;
+        }
     }
-
-
 }

@@ -80,11 +80,26 @@ public class UserService {
                 .build());
     }
 
-    public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request, HttpServletResponse response) {
-
+    public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        if (cookies != null) {
+            for (Cookie value : Arrays.stream(cookies).toList()) {
+                if (value.getName().equals("Authorization")) {
+                    token = value.getValue();
+                }
+            }
+        }
+        boolean loggedIn = this.jwtAuthenticatorFacade.loggedIn(token);
+        if (loggedIn) {
+            return ResponseEntity.ok(AuthResponseDto.builder()
+                    .code("PERMIT")
+                    .message("User logged in successfully")
+                    .build());
+        }
         return ResponseEntity.ok(AuthResponseDto.builder()
-                .code("PERMIT | DENIED")
-                .message("User logged in successfully")
+                .code("DENIED")
+                .message("User not logged in")
                 .build());
     }
 }

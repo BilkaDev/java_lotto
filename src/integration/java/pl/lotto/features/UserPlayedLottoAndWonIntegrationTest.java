@@ -172,13 +172,14 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // step 7: user want to checks if is logged in by GET /logged-in and system returned ok(200) with user data
         // given & when
         MvcResult loggedInResponse = mockMvc.perform(get("/api/v1/auth/logged-in")
+                        .cookie(authorizationCookie)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk()).andReturn();
 
         // then
         assertThat(loggedInResponse.getResponse().
                 getContentAsString()).
-                contains("someUser");
+                contains("PERMIT");
 
         // step 8: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
         // with message: "success" and Ticket (DrawDate: 27.07.2024 12:00 Saturday, TicketId: sampleTicketId)
