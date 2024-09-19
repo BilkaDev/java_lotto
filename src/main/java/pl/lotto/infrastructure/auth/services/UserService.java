@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import pl.lotto.domain.common.Code;
 import pl.lotto.domain.loginandregister.LoginAndRegisterFacade;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
-import pl.lotto.infrastructure.auth.ResponseDto;
 import pl.lotto.infrastructure.auth.dto.AuthResponseDto;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
 import pl.lotto.infrastructure.auth.dto.LoginResponseDto;
@@ -44,8 +43,7 @@ public class UserService {
         );
     }
 
-    public ResponseEntity<ResponseDto> register(RegisterRequestDto registerUserDto) {
-
+    public ResponseEntity<AuthResponseDto> register(RegisterRequestDto registerUserDto) {
         loginAndRegisterFacade.register(RegisterUserDto.builder()
                 .login(registerUserDto.login())
                 .password(bcryptEncoder.encode(registerUserDto.password()))
@@ -54,7 +52,7 @@ public class UserService {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ResponseDto.builder()
+                .body(AuthResponseDto.builder()
                         .code(Code.SUCCESS.name())
                         .message("User registered successfully")
                         .build()
