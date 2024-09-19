@@ -9,6 +9,7 @@ import lombok.Getter;
 public enum Code {
     SUCCESS("Operation end success"),
     PERMIT("Access granted"),
+    DENY("Access denied"),
     A1("The specified user with the given name does not exist"),
     A2("The specified data is invalid"),
     A3("The indicated token is empty or not valid"),

@@ -55,7 +55,7 @@ public class UserService {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ResponseDto.builder()
-                        .code("SUCCESS")
+                        .code(Code.SUCCESS.name())
                         .message("User registered successfully")
                         .build()
                 );
@@ -94,13 +94,13 @@ public class UserService {
         boolean loggedIn = this.jwtAuthenticatorFacade.loggedIn(token);
         if (loggedIn) {
             return ResponseEntity.ok(AuthResponseDto.builder()
-                    .code("PERMIT")
-                    .message("User logged in successfully")
+                    .code(Code.PERMIT.name())
+                    .message(Code.PERMIT.getLabel())
                     .build());
         }
         return ResponseEntity.ok(AuthResponseDto.builder()
-                .code("DENIED")
-                .message("User not logged in")
+                .code(Code.DENY.name())
+                .message(Code.DENY.getLabel())
                 .build());
     }
 
