@@ -34,9 +34,9 @@ public class AuthController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<AuthResponseDto> logout(HttpServletRequest request,HttpServletResponse response) {
         log.info("--TRY LOGOUT USER");
-        return null;
+        return this.userService.logout(request, response);
     }
 
     @PostMapping("/login")

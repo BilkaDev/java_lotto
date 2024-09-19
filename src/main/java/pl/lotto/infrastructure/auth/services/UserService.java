@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.lotto.domain.common.Code;
 import pl.lotto.domain.loginandregister.LoginAndRegisterFacade;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
 import pl.lotto.infrastructure.auth.ResponseDto;
@@ -100,6 +101,18 @@ public class UserService {
         return ResponseEntity.ok(AuthResponseDto.builder()
                 .code("DENIED")
                 .message("User not logged in")
+                .build());
+    }
+
+    public ResponseEntity<AuthResponseDto> logout(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Logout: Delete all cookies");
+        Cookie cookie = cookieService.removeCookie(request.getCookies(), "Authorization");
+        if (cookie != null) {
+            response.addCookie(cookie);
+        }
+        return ResponseEntity.ok(AuthResponseDto.builder()
+                .code(Code.SUCCESS.name())
+                .message(Code.SUCCESS.getLabel())
                 .build());
     }
 }

@@ -259,15 +259,14 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         CheckResultResponseDto responseDto = objectMapper.readValue(jsonGetResults, CheckResultResponseDto.class);
 
         assertAll(
-                () ->
-
-                        assertThat(responseDto.result().numbers()).contains(1, 2, 3, 4, 5, 6),
+                () -> assertThat(responseDto.result().numbers()).contains(1, 2, 3, 4, 5, 6),
                 () -> assertThat(responseDto.result().drawDate()).isEqualTo(drawDate),
                 () -> assertThat(responseDto.result().hash()).isEqualTo(ticketId),
                 () -> assertThat(responseDto.result().hitNumbers()).hasSize(6),
                 () -> assertThat(responseDto.result().isWinner()).isEqualTo(true),
                 () -> assertThat(responseDto.message()).isEqualTo("Congratulations, you won!")
         );
+
 
         // step 14: user wants to log off by request GET /logout and system returned ok(200) and clear cookies.
         // when
@@ -276,7 +275,10 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON));
         // then
         Cookie[] logoutCookies = logoutRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
-        assertThat(logoutCookies).isEmpty();
+        Cookie logoutCookie = Arrays.stream(logoutCookies).findFirst().filter(cookie -> "Authorization".equals(cookie.getName())).orElse(null);
+        assertThat(logoutCookie).isNotNull();
+        assertThat(logoutCookie.getMaxAge()).isZero();
+
     }
 }
 
