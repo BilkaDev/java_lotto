@@ -187,6 +187,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         // Given
         // When
         ResultActions postInputNumbers = mockMvc.perform(post("/api/v1/inputNumbers")
+                .cookie(authorizationCookie)
                 .content("""
                         {
                             "numbers": [1,2,3,4,5,6]
@@ -201,32 +202,10 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         String ticketId = inputNumbersResponseDto.ticket().ticketId();
 
         assertAll(
-                () ->
-
-                        assertThat(inputNumbersResponseDto.ticket().
-
-                                numbers()).
-
-                                contains(1, 2, 3, 4, 5, 6),
-                () ->
-
-                        assertThat(inputNumbersResponseDto.ticket().
-
-                                drawDate()).
-
-                                isEqualTo(drawDate),
-                () ->
-
-                        assertThat(inputNumbersResponseDto.ticket().
-
-                                ticketId()).
-
-                                isNotEmpty(),
-                () ->
-
-                        assertThat(inputNumbersResponseDto.message()).
-
-                                isEqualTo("SUCCESS")
+                () -> assertThat(inputNumbersResponseDto.ticket().numbers()).contains(1, 2, 3, 4, 5, 6),
+                () -> assertThat(inputNumbersResponseDto.ticket().drawDate()).isEqualTo(drawDate),
+                () -> assertThat(inputNumbersResponseDto.ticket().ticketId()).isNotEmpty(),
+                () -> assertThat(inputNumbersResponseDto.message()).isEqualTo("SUCCESS")
         );
 
 
@@ -237,23 +216,13 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON));
         // then
         getResultNotFoundId
-                .andExpect(
-
-                        status().
-
-                                isNotFound())
-                        .
-
-                andExpect(content()
-                        .
-
-                        json("""
-                                {
-                                    "messages":["Ticket with hash notExistingId not found"],
-                                    "status":"NOT_FOUND",
-                                    "code":"TICKET_NOT_FOUND"
-                                }
-                                """.trim())
+                .andExpect(status().isNotFound()).andExpect(content().json("""
+                        {
+                            "messages":["Ticket with hash notExistingId not found"],
+                            "status":"NOT_FOUND",
+                            "code":"TICKET_NOT_FOUND"
+                        }
+                        """.trim())
                 );
 
 
@@ -264,24 +233,14 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
         // step 11: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday,
         // and saved it with 6 hits
-        await().
-
-                atMost(20, TimeUnit.SECONDS)
-                        .
-
-                pollInterval(Duration.ofSeconds(1))
-                        .
-
-                until(() ->
-
-                {
-                    try {
-                        ResultDto byTicketId = resultCheckerFacade.findByTicketId(ticketId);
-                        return !byTicketId.numbers().isEmpty();
-                    } catch (Exception e) {
-                        return false;
-                    }
-                });
+        await().atMost(20, TimeUnit.SECONDS).pollInterval(Duration.ofSeconds(1)).until(() -> {
+            try {
+                ResultDto byTicketId = resultCheckerFacade.findByTicketId(ticketId);
+                return !byTicketId.numbers().isEmpty();
+            } catch (Exception e) {
+                return false;
+            }
+        });
 
 
         // step 12: 65 minutes passed, and it is 60 minute after the draw (27.07.2024 13:00 Saturday)
@@ -302,62 +261,22 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         assertAll(
                 () ->
 
-                        assertThat(responseDto.result().
-
-                                numbers()).
-
-                                contains(1, 2, 3, 4, 5, 6),
-                () ->
-
-                        assertThat(responseDto.result().
-
-                                drawDate()).
-
-                                isEqualTo(drawDate),
-                () ->
-
-                        assertThat(responseDto.result().
-
-                                hash()).
-
-                                isEqualTo(ticketId),
-                () ->
-
-                        assertThat(responseDto.result().
-
-                                hitNumbers()).
-
-                                hasSize(6),
-                () ->
-
-                        assertThat(responseDto.result().
-
-                                isWinner()).
-
-                                isEqualTo(true),
-                () ->
-
-                        assertThat(responseDto.message()).
-
-                                isEqualTo("Congratulations, you won!")
+                        assertThat(responseDto.result().numbers()).contains(1, 2, 3, 4, 5, 6),
+                () -> assertThat(responseDto.result().drawDate()).isEqualTo(drawDate),
+                () -> assertThat(responseDto.result().hash()).isEqualTo(ticketId),
+                () -> assertThat(responseDto.result().hitNumbers()).hasSize(6),
+                () -> assertThat(responseDto.result().isWinner()).isEqualTo(true),
+                () -> assertThat(responseDto.message()).isEqualTo("Congratulations, you won!")
         );
 
         // step 14: user wants to log off by request GET /logout and system returned ok(200) and clear cookies.
         // when
         ResultActions logoutRequest = mockMvc.perform(get("/api/v1/auth/logout")
+                .cookie(authorizationCookie)
                 .contentType(MediaType.APPLICATION_JSON));
         // then
-        logoutRequest.andExpect(
-
-                        status().
-
-                                isOk()).
-
-                andReturn().
-
-                getResponse().
-
-                getCookies();
+        Cookie[] logoutCookies = logoutRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
+        assertThat(logoutCookies).isEmpty();
     }
 }
 
