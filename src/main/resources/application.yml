@@ -32,3 +32,9 @@ lotto:
           readTimeout: 5000
   result-checker:
     resultCheckOccurrencesCron: "0 55 11 * * 6" # every Saturday at 11:55
+
+auth:
+  jwt:
+    expirationDays: 30
+    secret: ${JWT_SECRET}
+    issuer: lotto-backend

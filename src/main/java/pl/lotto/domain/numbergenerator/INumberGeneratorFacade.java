@@ -8,7 +8,7 @@ public interface INumberGeneratorFacade {
 
     WinningNumbersDto generateWinningNumbers();
 
-    WinningNumbersDto retrieveWinningNumbersByDate(LocalDateTime drawDate);
+    WinningNumbersDto retrieveWinningNumbersByDate(LocalDateTime drawDate) throws WinningNumbersNotFoundException;
 
     boolean areWinningNumbersGeneratedByDate();
 }

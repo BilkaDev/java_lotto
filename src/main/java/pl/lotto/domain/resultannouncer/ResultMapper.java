@@ -1,10 +1,10 @@
 package pl.lotto.domain.resultannouncer;
 
-import pl.lotto.domain.resultannouncer.dto.ResponseDto;
+import pl.lotto.domain.resultannouncer.dto.ResultDto;
 
 public class ResultMapper {
-    public static ResponseDto mapToDto(ResultResponse resultResponse) {
-        return ResponseDto.builder()
+    public static ResultDto mapToDto(ResultResponse resultResponse) {
+        return ResultDto.builder()
                 .hash(resultResponse.getHash())
                 .drawDate(resultResponse.getDrawDate())
                 .hitNumbers(resultResponse.getHitNumbers())

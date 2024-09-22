@@ -3,12 +3,12 @@ package pl.lotto.domain.resultannouncer;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
+import pl.lotto.domain.numberreceiver.TicketNotFoundException;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
-import pl.lotto.domain.resultannouncer.dto.ResponseDto;
+import pl.lotto.domain.resultannouncer.dto.ResultDto;
 import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
 import pl.lotto.domain.resultchecker.PlayerResultNotFoundException;
 import pl.lotto.domain.resultchecker.ResultCheckerFacade;
-import pl.lotto.domain.resultchecker.dto.ResultDto;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -25,23 +25,23 @@ public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
 
     @Override
     @Cacheable(cacheNames = "results")
-    public ResultResponseDto checkResult(String hash) {
+    public ResultResponseDto checkResult(String hash) throws TicketNotFoundException {
         TicketDto ticketDto = numberReceiverFacade.retrieveTicketByHash(hash);
 
         if (resultResponseRepository.existsById(hash)) {
             Optional<ResultResponse> resultResponseCached = resultResponseRepository.findById(hash);
             if (resultResponseCached.isPresent()) {
                 return ResultResponseDto.builder().message(ALREADY_CHECKED.info)
-                        .responseDto(ResultMapper.mapToDto(resultResponseCached.get())).build();
+                        .resultDto(ResultMapper.mapToDto(resultResponseCached.get())).build();
             }
         }
-        ResultDto resultDto;
+        pl.lotto.domain.resultchecker.dto.ResultDto resultDto;
         try {
             resultDto = resultCheckerFacade.findByTicketId(hash);
         } catch (PlayerResultNotFoundException e) {
             return ResultResponseDto.builder()
-                    .responseDto(
-                            ResponseDto.builder()
+                    .resultDto(
+                            ResultDto.builder()
                                     .hash(hash)
                                     .numbers(ticketDto.numbersFromUsers())
                                     .hitNumbers(null)
@@ -52,30 +52,30 @@ public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
                     ).message(WAIT_MESSAGE.info).build();
         }
 
-        ResponseDto responseDto = buildResponseDto(resultDto);
+        ResultDto responseDto = buildResponseDto(resultDto);
         resultResponseRepository.save(buildResponse(responseDto, LocalDateTime.now(clock)));
         if (resultResponseRepository.existsById(hash) && !isAfterResultAnnouncementTime(resultDto)) {
-            return ResultResponseDto.builder().message(WAIT_MESSAGE.info).responseDto(responseDto).build();
+            return ResultResponseDto.builder().message(WAIT_MESSAGE.info).resultDto(responseDto).build();
         }
-        if (resultCheckerFacade.findByTicketId(hash).isWinner()) {
-            return ResultResponseDto.builder().message(WIN_MESSAGE.info).responseDto(responseDto).build();
+        if (resultDto.isWinner()) {
+            return ResultResponseDto.builder().message(WIN_MESSAGE.info).resultDto(responseDto).build();
         }
-        return ResultResponseDto.builder().message(LOSE_MESSAGE.info).responseDto(responseDto).build();
+        return ResultResponseDto.builder().message(LOSE_MESSAGE.info).resultDto(responseDto).build();
     }
 
-    private static ResultResponse buildResponse(ResponseDto responseDto, LocalDateTime now) {
+    private static ResultResponse buildResponse(ResultDto resultDto, LocalDateTime now) {
         return ResultResponse.builder()
-                .hash(responseDto.hash())
-                .numbers(responseDto.numbers())
-                .hitNumbers(responseDto.hitNumbers())
-                .wonNumbers(responseDto.wonNumbers())
-                .drawDate(responseDto.drawDate())
-                .isWinner(responseDto.isWinner())
+                .hash(resultDto.hash())
+                .numbers(resultDto.numbers())
+                .hitNumbers(resultDto.hitNumbers())
+                .wonNumbers(resultDto.wonNumbers())
+                .drawDate(resultDto.drawDate())
+                .isWinner(resultDto.isWinner())
                 .createdDate(now).build();
     }
 
-    private static ResponseDto buildResponseDto(ResultDto resultDto) {
-        return ResponseDto.builder()
+    private static ResultDto buildResponseDto(pl.lotto.domain.resultchecker.dto.ResultDto resultDto) {
+        return ResultDto.builder()
                 .hash(resultDto.hash())
                 .numbers(resultDto.numbers())
                 .hitNumbers(resultDto.hitNumbers())
@@ -85,7 +85,7 @@ public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
                 .build();
     }
 
-    private boolean isAfterResultAnnouncementTime(ResultDto resultDto) {
+    private boolean isAfterResultAnnouncementTime(pl.lotto.domain.resultchecker.dto.ResultDto resultDto) {
         LocalDateTime announcementDateTime = resultDto.drawDate();
         return LocalDateTime.now(clock).isAfter(announcementDateTime);
     }

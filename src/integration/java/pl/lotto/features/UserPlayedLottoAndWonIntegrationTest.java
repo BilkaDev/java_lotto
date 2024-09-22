@@ -1,6 +1,7 @@
 package pl.lotto.features;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,9 @@ import pl.lotto.infrastructure.resultannoucer.controller.CheckResultResponseDto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -65,13 +68,141 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                             }
                         }
                 );
+        //step 3: user tried to get JWT token by requesting POST /token with username=someUser, password=somePassword and system returned UNAUTHORIZED(401)
+        // given & when
+        ResultActions failedLoginRequest = mockMvc.perform(post("/api/v1/auth/login")
+                .content("""
+                        {
+                        "login": "someUser",
+                        "password": "somePassword"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
 
-        // step 3: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
+        // then
+        failedLoginRequest
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().json("""
+                        {
+                            "messages":["The specified user with the given name does not exist"],
+                            "status":"UNAUTHORIZED",
+                            "code":"A1"
+                        }
+                        """.trim()));
+
+
+        // step 3.1: user tried to get user data by querying /api/v1/auto-login and system returned unauthorized(401)
+        mockMvc.perform(get("/api/v1/auth/auto-login")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isUnauthorized());
+
+
+        // step 4: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned unauthorized(401)
+        // given && when
+        ResultActions failedPostInputRequest = mockMvc.perform(post("/api/v1/inputNumbers")
+                .content("""
+                        {
+                            "numbers": [1,2,3,4,5,6]
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        failedPostInputRequest.andExpect(status().isUnauthorized());
+
+
+        // step 5: user made POST /register with login=someUser, password=somePassword, email: some@email.com and system registered user with status CREATED(201)
+        // given & when
+        ResultActions registerUser = mockMvc.perform(post("/api/v1/auth/register")
+                .content("""
+                        {
+                            "login": "someUser",
+                            "password": "somePassword",
+                            "email": "some@email.com"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        registerUser.andExpect(status().isCreated());
+
+
+        // step 5.1: user made POST /register with login=someUser, password=somePassword, email: some@email.com but login already exists and system returned status BAD_REQUEST(400)
+        // given & when
+        ResultActions registerUserM = mockMvc.perform(post("/api/v1/auth/register")
+                .content("""
+                        {
+                            "login": "someUser",
+                            "password": "somePassword",
+                            "email": "some@email.com"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        registerUserM.andExpect(status().isBadRequest());
+
+        //step 6: user tried to get user data by requesting POST /login with login=someUser, password=somePassword and system returned OK(200) with user data
+        // and cookies with jwt token.
+        // given & when
+        ResultActions successLoginRequest = mockMvc.perform(post("/api/v1/auth/login")
+                .content("""
+                        {
+                        "login": "someUser",
+                        "password": "somePassword"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        //then
+
+        MvcResult mvcResultLogin = successLoginRequest.andExpect(status().isOk()).andReturn();
+        Cookie[] cookies = mvcResultLogin.getResponse().getCookies();
+        assertThat(cookies).isNotEmpty();
+        Cookie authorizationCookie = Arrays.stream(cookies)
+                .filter(cookie -> "Authorization".equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
+        assertThat(authorizationCookie).isNotNull();
+        String jwtRegex = "^[A-Za-z0-9-_=]+\\.([A-Za-z0-9-_=]+)\\.([A-Za-z0-9-_.+/=]*)$";
+        Pattern pattern = Pattern.compile(jwtRegex);
+
+        assertThat(pattern.matcher(authorizationCookie.getValue()).matches())
+                .as("Authorization cookie should contain a valid JWT token")
+                .isTrue();
+
+
+        // step 6.1: user tried to get user data by querying /api/v1/auto-login and system returned ok(200) with user data
+        // given & when
+        MvcResult autoLoginResponse = mockMvc.perform(get("/api/v1/auth/auto-login")
+                        .cookie(authorizationCookie)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk()).andReturn();
+        // then
+        assertThat(autoLoginResponse.getResponse().getContentAsString()).contains("someUser");
+
+
+        // step 7: user want to checks if is logged in by GET /logged-in and system returned ok(200) with user data
+        // given & when
+        MvcResult loggedInResponse = mockMvc.perform(get("/api/v1/auth/logged-in")
+                        .cookie(authorizationCookie)
+                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(status().isOk()).andReturn();
+
+        // then
+        assertThat(loggedInResponse.getResponse().
+                getContentAsString()).
+                contains("PERMIT");
+
+        // step 8: user made POST /inputNumbers with 6 numbers (1,2,3,4,5,6) at 24-07-2024 10:00 and system returned ok(200)
         // with message: "success" and Ticket (DrawDate: 27.07.2024 12:00 Saturday, TicketId: sampleTicketId)
 
         // Given
         // When
         ResultActions postInputNumbers = mockMvc.perform(post("/api/v1/inputNumbers")
+                .cookie(authorizationCookie)
                 .content("""
                         {
                             "numbers": [1,2,3,4,5,6]
@@ -84,6 +215,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         String json = mvcResult.getResponse().getContentAsString();
         InputNumbersResponseDto inputNumbersResponseDto = objectMapper.readValue(json, InputNumbersResponseDto.class);
         String ticketId = inputNumbersResponseDto.ticket().ticketId();
+
         assertAll(
                 () -> assertThat(inputNumbersResponseDto.ticket().numbers()).contains(1, 2, 3, 4, 5, 6),
                 () -> assertThat(inputNumbersResponseDto.ticket().drawDate()).isEqualTo(drawDate),
@@ -92,50 +224,46 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         );
 
 
-        // step 4: user made GET /results/notExistingTicketId and system returned not found(404) and with
+        // step 9: user made GET /results/notExistingTicketId and system returned not found(404) and with
         // (message: "Not found for id: notExistingId", and status: "NOT_FOUND")
         // when
         ResultActions getResultNotFoundId = mockMvc.perform(get("/api/v1/results/notExistingId")
                 .contentType(MediaType.APPLICATION_JSON));
         // then
         getResultNotFoundId
-                .andExpect(status().isNotFound())
-                .andExpect(content()
-                        .json("""
-                                {
-                                    "messages":["Ticket with hash notExistingId not found"],
-                                    "status":"NOT_FOUND",
-                                    "code":"TICKET_NOT_FOUND"
-                                }
-                                """.trim())
+                .andExpect(status().isNotFound()).andExpect(content().json("""
+                        {
+                            "messages":["Ticket with hash notExistingId not found"],
+                            "status":"NOT_FOUND",
+                            "code":"TICKET_NOT_FOUND"
+                        }
+                        """.trim())
                 );
 
 
-        // step 5: 3 days and 55 minutes passed, and it is 5 minute before draw date: 27.07.2024 11:55 Saturday
+        // step 10: 3 days and 55 minutes passed, and it is 5 minute before draw date: 27.07.2024 11:55 Saturday
         // given
         clock.plusDaysAndMinutes(3, 55);
 
 
-        // step 6: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday,
+        // step 11: system generated result for TicketId: sampleTicketId with draw date 27.07.2024 12:00 Saturday,
         // and saved it with 6 hits
-        await().atMost(20, TimeUnit.SECONDS)
-                .pollInterval(Duration.ofSeconds(1))
-                .until(() -> {
-                    try {
-                        ResultDto byTicketId = resultCheckerFacade.findByTicketId(ticketId);
-                        return !byTicketId.numbers().isEmpty();
-                    } catch (Exception e) {
-                        return false;
-                    }
-                });
+        await().atMost(20, TimeUnit.SECONDS).pollInterval(Duration.ofSeconds(1)).until(() -> {
+            try {
+                ResultDto byTicketId = resultCheckerFacade.findByTicketId(ticketId);
+                return !byTicketId.numbers().isEmpty();
+            } catch (Exception e) {
+                return false;
+            }
+        });
 
 
-        // step 7: 65 minutes passed, and it is 60 minute after the draw (27.07.2024 13:00 Saturday)
+        // step 12: 65 minutes passed, and it is 60 minute after the draw (27.07.2024 13:00 Saturday)
         // given
         clock.plusMinutes(66);
 
 
-        // step 8: user made GET /results/sampleTicketId and system returned ok(200)
+        // step 13: user made GET /results/sampleTicketId and system returned ok(200)
         // when
         ResultActions successResultPerform = mockMvc.perform(get("/api/v1/results/" + ticketId)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -144,6 +272,7 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         MvcResult mvcResultGetResults = successResultPerform.andExpect(status().isOk()).andReturn();
         String jsonGetResults = mvcResultGetResults.getResponse().getContentAsString();
         CheckResultResponseDto responseDto = objectMapper.readValue(jsonGetResults, CheckResultResponseDto.class);
+
         assertAll(
                 () -> assertThat(responseDto.result().numbers()).contains(1, 2, 3, 4, 5, 6),
                 () -> assertThat(responseDto.result().drawDate()).isEqualTo(drawDate),
@@ -152,6 +281,19 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 () -> assertThat(responseDto.result().isWinner()).isEqualTo(true),
                 () -> assertThat(responseDto.message()).isEqualTo("Congratulations, you won!")
         );
+
+
+        // step 14: user wants to log off by request GET /logout and system returned ok(200) and clear cookies.
+        // when
+        ResultActions logoutRequest = mockMvc.perform(get("/api/v1/auth/logout")
+                .cookie(authorizationCookie)
+                .contentType(MediaType.APPLICATION_JSON));
+        // then
+        Cookie[] logoutCookies = logoutRequest.andExpect(status().isOk()).andReturn().getResponse().getCookies();
+        Cookie logoutCookie = Arrays.stream(logoutCookies).findFirst().filter(cookie -> "Authorization".equals(cookie.getName())).orElse(null);
+        assertThat(logoutCookie).isNotNull();
+        assertThat(logoutCookie.getMaxAge()).isZero();
+
     }
 }
 

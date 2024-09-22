@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 @Builder
 public record ResultResponseDto(
-        ResponseDto responseDto,
+        ResultDto resultDto,
         String message
 ) implements Serializable {
 }

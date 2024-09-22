@@ -25,7 +25,7 @@ public class NumberReceiverFacade implements INumberReceiverFacade {
     private IDrawDateGeneratorFacade drawDateGenerator;
 
     @Override
-    public NumberReceiverResponseDto inputNumbers(Set<Integer> numbersFromUser) {
+    public NumberReceiverResponseDto inputNumbers(Set<Integer> numbersFromUser) throws ValidationException {
 
         String validationResult = numberValidator.validation(numbersFromUser);
         if (!validationResult.isEmpty())
@@ -66,7 +66,7 @@ public class NumberReceiverFacade implements INumberReceiverFacade {
     }
 
     @Override
-    public TicketDto retrieveTicketByHash(String hash) {
+    public TicketDto retrieveTicketByHash(String hash) throws TicketNotFoundException {
         return numberReceiverRepository.findByHash(hash)
                 .map(TicketMapper::mapFromTicket)
                 .orElseThrow(() -> new TicketNotFoundException("TICKET_NOT_FOUND", hash));
