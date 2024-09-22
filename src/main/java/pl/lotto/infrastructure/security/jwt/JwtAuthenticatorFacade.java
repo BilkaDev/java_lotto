@@ -43,7 +43,7 @@ public class JwtAuthenticatorFacade {
             return JwtResponseDto.builder()
                     .token(decodedJWT.getToken())
                     .email(userDto.email())
-                    .tokenExp((long) decodedJWT.getExpiresAt().getDay())
+                    .tokenExp(decodedJWT.getExpiresAt().getTime())
                     .login(userDto.login())
                     .build();
         } catch (
