@@ -35,7 +35,7 @@ public class JwtAuthenticatorFacade {
                 .build();
     }
 
-    public JwtResponseDto loginByToken(String token) {
+    public JwtResponseDto loginByToken(String token) throws TokenExpiredException {
         try {
             DecodedJWT decodedJWT = jwtService.validateToken(token);
             String login = decodedJWT.getSubject();

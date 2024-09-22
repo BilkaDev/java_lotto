@@ -1,7 +1,7 @@
-package pl.lotto.infrastructure.config;
+package pl.lotto.infrastructure.httpexceptions;
 
 import lombok.Builder;
-import pl.lotto.domain.common.HttpStatus;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 

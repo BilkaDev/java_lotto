@@ -3,6 +3,7 @@ package pl.lotto.domain.resultannouncer;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import pl.lotto.domain.numberreceiver.INumberReceiverFacade;
+import pl.lotto.domain.numberreceiver.TicketNotFoundException;
 import pl.lotto.domain.numberreceiver.dto.TicketDto;
 import pl.lotto.domain.resultannouncer.dto.ResultDto;
 import pl.lotto.domain.resultannouncer.dto.ResultResponseDto;
@@ -24,7 +25,7 @@ public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
 
     @Override
     @Cacheable(cacheNames = "results")
-    public ResultResponseDto checkResult(String hash) {
+    public ResultResponseDto checkResult(String hash) throws TicketNotFoundException {
         TicketDto ticketDto = numberReceiverFacade.retrieveTicketByHash(hash);
 
         if (resultResponseRepository.existsById(hash)) {
@@ -56,7 +57,7 @@ public class ResultAnnouncerFacade implements IResultAnnouncerFacade {
         if (resultResponseRepository.existsById(hash) && !isAfterResultAnnouncementTime(resultDto)) {
             return ResultResponseDto.builder().message(WAIT_MESSAGE.info).resultDto(responseDto).build();
         }
-        if (resultCheckerFacade.findByTicketId(hash).isWinner()) {
+        if (resultDto.isWinner()) {
             return ResultResponseDto.builder().message(WIN_MESSAGE.info).resultDto(responseDto).build();
         }
         return ResultResponseDto.builder().message(LOSE_MESSAGE.info).resultDto(responseDto).build();

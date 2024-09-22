@@ -49,7 +49,7 @@ public class JwtService {
     }
 
 
-    public DecodedJWT validateToken(String token) throws TokenExpiredException {
+    public DecodedJWT validateToken(String token) {
         DecodedJWT decodedJWT;
         try {
             decodedJWT = verifyToken(token);

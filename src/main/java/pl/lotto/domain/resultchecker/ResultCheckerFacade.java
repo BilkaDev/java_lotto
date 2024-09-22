@@ -39,7 +39,7 @@ public class ResultCheckerFacade {
     }
 
 
-    public ResultDto findByTicketId(String ticketId) {
+    public ResultDto findByTicketId(String ticketId) throws PlayerResultNotFoundException {
         Player player = playerRepository.findById(ticketId)
                 .orElseThrow(() -> new PlayerResultNotFoundException("Not found for id: " + ticketId));
         return ResultDto.builder()

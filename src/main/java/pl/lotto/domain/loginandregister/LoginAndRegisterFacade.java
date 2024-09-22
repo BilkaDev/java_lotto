@@ -25,7 +25,7 @@ public class LoginAndRegisterFacade implements ILoginAndRegisterFacade {
     }
 
     @Override
-    public RegistrationResultDto register(RegisterUserDto registerUserDto) {
+    public RegistrationResultDto register(RegisterUserDto registerUserDto) throws UserExistingWithLoginException {
         userRepository.findByLogin(registerUserDto.login()).ifPresent((v) -> {
             throw new UserExistingWithLoginException();
         });

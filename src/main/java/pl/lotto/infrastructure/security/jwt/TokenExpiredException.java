@@ -1,16 +1,11 @@
 package pl.lotto.infrastructure.security.jwt;
 
-import pl.lotto.domain.common.BaseException;
+import org.springframework.http.HttpStatus;
 import pl.lotto.domain.common.Code;
-import pl.lotto.domain.common.HttpStatus;
+import pl.lotto.infrastructure.httpexceptions.HttpException;
 
-public class TokenExpiredException extends BaseException {
+public class TokenExpiredException extends HttpException {
     public TokenExpiredException() {
-        super(Code.A3.name(), Code.A3.getLabel());
-    }
-
-    @Override
-    public HttpStatus getStatusCode() {
-        return HttpStatus.UNAUTHORIZED;
+        super(HttpStatus.UNAUTHORIZED, Code.A3.name(), Code.A3.getLabel());
     }
 }

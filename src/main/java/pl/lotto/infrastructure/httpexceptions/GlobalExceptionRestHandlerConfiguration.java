@@ -1,6 +1,7 @@
-package pl.lotto.infrastructure.config;
+package pl.lotto.infrastructure.httpexceptions;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -8,7 +9,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import pl.lotto.domain.common.BaseException;
 import pl.lotto.domain.common.Code;
-import pl.lotto.domain.common.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,13 +22,19 @@ public class GlobalExceptionRestHandlerConfiguration {
         log.error("Base exception occurred: {}", e.getMessage());
         String message = e.getMessage();
         String code = e.getCode();
-        HttpStatus statusCode = e.getStatusCode();
+        HttpStatus statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+
+        if (e instanceof HttpException) {
+            statusCode = ((HttpException) e).getStatusCode();
+        }
+
         ApiErrorDto response = ApiErrorDto.builder()
                 .code(code)
                 .messages(List.of(message))
                 .status(statusCode)
                 .build();
-        return ResponseEntity.status(statusCode.getValue()).body(response);
+
+        return ResponseEntity.status(statusCode.value()).body(response);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -39,7 +45,7 @@ public class GlobalExceptionRestHandlerConfiguration {
                 .messages(List.of(Code.A1.getLabel()))
                 .status(HttpStatus.UNAUTHORIZED)
                 .build();
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.getValue()).body(response);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -53,7 +59,7 @@ public class GlobalExceptionRestHandlerConfiguration {
                 .messages(errors)
                 .status(HttpStatus.BAD_REQUEST)
                 .build();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST.getValue()).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST.value()).body(response);
     }
 
     @ExceptionHandler(Exception.class)
@@ -65,7 +71,7 @@ public class GlobalExceptionRestHandlerConfiguration {
         ApiErrorDto response = messages
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.getValue()).body(response);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(response);
     }
 
     @ExceptionHandler(RuntimeException.class)
@@ -77,7 +83,7 @@ public class GlobalExceptionRestHandlerConfiguration {
                 .messages(messages)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.getValue()).body(response);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR.value()).body(response);
     }
 
 

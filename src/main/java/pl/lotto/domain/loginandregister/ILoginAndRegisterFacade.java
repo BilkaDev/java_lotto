@@ -8,6 +8,6 @@ import pl.lotto.domain.loginandregister.dto.UserDto;
 public interface ILoginAndRegisterFacade {
     UserDto findByLogin(String login) throws UsernameNotFoundException;
 
-    RegistrationResultDto register(RegisterUserDto registerUserDto);
+    RegistrationResultDto register(RegisterUserDto registerUserDto) throws UserExistingWithLoginException;
 
 }

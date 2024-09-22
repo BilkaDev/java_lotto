@@ -11,11 +11,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.lotto.domain.common.Code;
 import pl.lotto.domain.loginandregister.LoginAndRegisterFacade;
+import pl.lotto.domain.loginandregister.UserExistingWithLoginException;
 import pl.lotto.domain.loginandregister.dto.RegisterUserDto;
 import pl.lotto.infrastructure.auth.dto.AuthResponseDto;
 import pl.lotto.infrastructure.auth.dto.LoginRequestDto;
 import pl.lotto.infrastructure.auth.dto.LoginResponseDto;
 import pl.lotto.infrastructure.auth.dto.RegisterRequestDto;
+import pl.lotto.infrastructure.httpexceptions.HttpException;
 import pl.lotto.infrastructure.security.jwt.JwtAuthenticatorFacade;
 import pl.lotto.infrastructure.security.jwt.TokenExpiredException;
 import pl.lotto.infrastructure.security.jwt.dto.JwtResponseDto;
@@ -44,19 +46,24 @@ public class UserService {
     }
 
     public ResponseEntity<AuthResponseDto> register(RegisterRequestDto registerUserDto) {
-        loginAndRegisterFacade.register(RegisterUserDto.builder()
-                .login(registerUserDto.login())
-                .password(bcryptEncoder.encode(registerUserDto.password()))
-                .email(registerUserDto.email())
-                .build());
+        try {
+            loginAndRegisterFacade.register(RegisterUserDto.builder()
+                    .login(registerUserDto.login())
+                    .password(bcryptEncoder.encode(registerUserDto.password()))
+                    .email(registerUserDto.email())
+                    .build());
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(AuthResponseDto.builder()
-                        .code(Code.SUCCESS.name())
-                        .message("User registered successfully")
-                        .build()
-                );
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(AuthResponseDto.builder()
+                            .code(Code.SUCCESS.name())
+                            .message("User registered successfully")
+                            .build()
+                    );
+        } catch (UserExistingWithLoginException e) {
+            log.error("Error occurred during registration: {}", e.getMessage());
+            throw new HttpException(HttpStatus.BAD_REQUEST, e);
+        }
     }
 
     public ResponseEntity<LoginResponseDto> autoLogin(HttpServletRequest request) {
@@ -72,11 +79,18 @@ public class UserService {
             log.info("Can't login because token is empty");
             throw new TokenExpiredException();
         }
-        JwtResponseDto jwtResponseDto = jwtAuthenticatorFacade.loginByToken(token);
-        return ResponseEntity.ok(LoginResponseDto.builder()
-                .email(jwtResponseDto.email())
-                .login(jwtResponseDto.login())
-                .build());
+        try {
+
+            JwtResponseDto jwtResponseDto = jwtAuthenticatorFacade.loginByToken(token);
+            return ResponseEntity.ok(LoginResponseDto.builder()
+                    .email(jwtResponseDto.email())
+                    .login(jwtResponseDto.login())
+                    .build());
+        } catch (TokenExpiredException e) {
+            log.info("Can't login because token expired");
+            throw new HttpException(HttpStatus.UNAUTHORIZED, e);
+        }
+
     }
 
     public ResponseEntity<AuthResponseDto> loggedIn(HttpServletRequest request) {

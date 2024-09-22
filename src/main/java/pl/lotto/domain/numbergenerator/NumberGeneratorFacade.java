@@ -38,7 +38,7 @@ public class NumberGeneratorFacade implements INumberGeneratorFacade {
     }
 
     @Override
-    public WinningNumbersDto retrieveWinningNumbersByDate(LocalDateTime drawDate) {
+    public WinningNumbersDto retrieveWinningNumbersByDate(LocalDateTime drawDate) throws WinningNumbersNotFoundException {
         WinningNumbers winningNumbers = winningNumbersRepository.findByDrawDate(drawDate)
                 .orElseThrow(WinningNumbersNotFoundException::new);
         return WinningNumbersDto.builder()

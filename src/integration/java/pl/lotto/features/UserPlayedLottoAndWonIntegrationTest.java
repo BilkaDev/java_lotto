@@ -128,6 +128,21 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         registerUser.andExpect(status().isCreated());
 
 
+        // step 5.1: user made POST /register with login=someUser, password=somePassword, email: some@email.com but login already exists and system returned status BAD_REQUEST(400)
+        // given & when
+        ResultActions registerUserM = mockMvc.perform(post("/api/v1/auth/register")
+                .content("""
+                        {
+                            "login": "someUser",
+                            "password": "somePassword",
+                            "email": "some@email.com"
+                        }
+                        """.trim())
+                .contentType(MediaType.APPLICATION_JSON_VALUE));
+
+        // then
+        registerUserM.andExpect(status().isBadRequest());
+
         //step 6: user tried to get user data by requesting POST /login with login=someUser, password=somePassword and system returned OK(200) with user data
         // and cookies with jwt token.
         // given & when
