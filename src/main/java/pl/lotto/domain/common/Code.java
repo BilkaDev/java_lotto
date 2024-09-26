@@ -15,7 +15,7 @@ public enum Code {
     A3("The indicated token is empty or not valid"),
     A4("The user with the specified name does not exist"),
     A5("The user with the specified email already exists"),
-    A6("The user does not exist");
+    A6("Incorrect credentials");
     private final String label;
 
     Code(final String label) {

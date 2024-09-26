@@ -41,8 +41,8 @@ public class GlobalExceptionRestHandlerConfiguration {
     public ResponseEntity<ApiErrorDto> handleBadCredentialsException(BadCredentialsException ex) {
         log.error("Bad credentials exception occurred: {}", ex.getMessage());
         ApiErrorDto response = ApiErrorDto.builder()
-                .code(Code.A1.toString())
-                .messages(List.of(Code.A1.getLabel()))
+                .code(Code.A6.toString())
+                .messages(List.of(Code.A6.getLabel()))
                 .status(HttpStatus.UNAUTHORIZED)
                 .build();
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(response);

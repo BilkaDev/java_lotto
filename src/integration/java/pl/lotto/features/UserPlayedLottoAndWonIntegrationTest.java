@@ -85,9 +85,9 @@ public class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().json("""
                         {
-                            "messages":["The specified user with the given name does not exist"],
+                            "messages":["Incorrect credentials"],
                             "status":"UNAUTHORIZED",
-                            "code":"A1"
+                            "code":"A6"
                         }
                         """.trim()));
 
