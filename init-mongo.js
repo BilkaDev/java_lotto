@@ -82,3 +82,10 @@ db.getCollection("ticket").insertOne({
     drawDate: new ISODate("2024-07-27T10:00:00.000Z"),
     numbersFromUsers: lostNumbers,
 });
+
+db.getCollection("user").insertOne({
+    _id: new ObjectId(),
+    login: "test",
+    email: "test@example.com",
+    password: "$2a$10$K4/aqjs88YjVlt.zKbT08O7i0S8c/Xx5iBH6ev5VaksM03S.MJz2S",
+});

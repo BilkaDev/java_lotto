@@ -37,3 +37,25 @@ services:
       - REDIS_HOSTS=local:redis:6379
     ports:
       - "8082:8081"
+
+  lotto:
+    container_name: lotto
+    build: .
+    #image: 783764591223.dkr.ecr.eu-north-1.amazonaws.com/lotto:latest
+    restart: always
+    ports:
+      - '8000:8080'
+    environment:
+      MONGO_URI: 'mongodb://admin:admin@mongo:27017/lotto-web?authSource=admin'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: secret
+      FE_CORS_ORIGIN: http://localhost
+  lotto-frontend:
+    container_name: lotto-frontend
+    image: lotto-fe:latest
+    #image: 783764591223.dkr.ecr.eu-north-1.amazonaws.com/lotto-fe:latest
+    restart: always
+    ports:
+      - '80:80'
+
